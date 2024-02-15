@@ -1,12 +1,10 @@
 <?php
 session_start();
+$noNavbar = '';
 if (isset($_SESSION['Username'])) {
     header('Location: dashboard.php'); // Redirect to dashboard page
 }
-print_r($_SESSION);
 include 'init.php';
-include $tpl . 'header.php';
-include 'includes/languages/en.php';
 
 // Check if user coming from HTTP Post request
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -30,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 ?>
 
 
-<form class="login" action="<?php echo $_SERVER['PHP_SELF'] ?>" method="post">
+<form class="login" action="<?php htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="post">
     <h4 class="text-center">Admin Login</h4>
     <input class="form-control input-lg" type="text" name="user" placeholder="Username" autocomplete="off">
     <input class="form-control input-lg" type="password" name="pass" placeholder="Password" autocomplete="new-password">
