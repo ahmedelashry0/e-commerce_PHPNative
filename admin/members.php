@@ -25,7 +25,7 @@ if (isset($_SESSION['Username'])) {
                     <div class="form-group form-group-lg">
                         <label class="col-sm-2 control-label">Username</label>
                         <div class="col-sm-10 col-md-5">
-                            <input type="text" name="username" class="form-control" value="<?php echo $row['userName'] ?>" autocomplete="off" required="required" />
+                            <input type="text" name="username" class="form-control" value="<?php echo $row['userName'] ?>" autocomplete="off" required = "required" />
                         </div>
                     </div>
                     <!-- End Username Field -->
@@ -33,7 +33,8 @@ if (isset($_SESSION['Username'])) {
                     <div class="form-group form-group-lg">
                         <label class="col-sm-2 control-label">Password</label>
                         <div class="col-sm-10 col-md-5">
-                            <input type="password" name="newpassword" class="form-control" autocomplete="new-password" />
+                            <input type="hidden" name="oldpassword" value="<?php echo $row['Pass']; ?>" />
+                            <input type="password" name="newpassword" class="form-control" autocomplete="new-password" placeholder="Leve Blank if you don't want to change" />
                         </div>
                     </div>
                     <!-- End Password Field -->
@@ -41,7 +42,7 @@ if (isset($_SESSION['Username'])) {
                     <div class="form-group form-group-lg">
                         <label class="col-sm-2 control-label">Email</label>
                         <div class="col-sm-10 col-md-5">
-                            <input type="email" name="email" class="form-control " value="<?php echo $row["Email"] ?>" />
+                            <input type="email" name="email" class="form-control " value="<?php echo $row["Email"] ?>" required = "required" />
                         </div>
                     </div>
                     <!-- End Email Field -->
@@ -49,7 +50,7 @@ if (isset($_SESSION['Username'])) {
                     <div class="form-group form-group-lg">
                         <label class="col-sm-2 control-label">Full Name</label>
                         <div class="col-sm-10 col-md-5">
-                            <input type="text" name="full" class="form-control" value="<?php echo $row['Fullname'] ?>" />
+                            <input type="text" name="full" class="form-control" value="<?php echo $row['Fullname'] ?>" required="required" />
                         </div>
                     </div>
                     <!-- End Full Name Field -->
@@ -67,17 +68,43 @@ if (isset($_SESSION['Username'])) {
             echo 'There is no such ID';
         }
     } elseif ($do == 'Update') {
+        echo "<h1 class='text-center'>Update Member</h1>";
+        echo "<div class='container'>";
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            echo "<h1 class='text-center'>Update Member</h1>";
             $id = $_POST['userID'];
             $userName = $_POST['username'];
             $email = $_POST['email'];
             $fullName = $_POST['full'];
-            $stmt = $dbconc-> prepare("UPDATE users SET userName = ? , Email = ? , Fullname = ? WHERE userID = ?");
-            $stmt-> execute(array($userName, $email, $fullName, $id));
-        }else {
+            $password = empty($_POST['newpassword']) ? $_POST['oldpassword'] : sha1($_POST['newpassword']);
+            // Validate the form
+            $formErrors = array();
+            if (strlen($userName) < 4) {
+                $formErrors[] = '<div class="alert alert-danger">Username can\'t be less than <strong>4 characters</strong></div>';
+            }
+            if (strlen($userName) > 20) {
+                $formErrors[] = '<div class="alert alert-danger">Username can\'t be more than <strong>20 characters</strong></div>';
+            }
+            if (empty($userName)) {
+                $formErrors[] = '<div class="alert alert-danger">Username can\'t be <strong>empty</strong></div>';
+            }
+            if (empty($email)) {
+                $formErrors[] = '<div class="alert alert-danger">Email can\'t be <strong>empty</strong></div>';
+            }
+            if (empty($fullName)) {
+                $formErrors[] = '<div class="alert alert-danger">Full Name can\'t be <strong>empty</strong></div>';
+            }
+            foreach ($formErrors as $error) {
+                echo   $error;
+            }
+            if (empty($formErrors)) {
+                $stmt = $dbconc->prepare("UPDATE users SET userName = ? , Email = ? , Fullname = ? , Pass= ? WHERE userID = ?");
+                $stmt->execute(array($userName, $email, $fullName, $password, $id));
+                echo "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record update </div>';
+            }
+        } else {
             echo 'You are not authorized to view this page.';
         }
+        echo "</div>";
     }
     include $tpl . 'footer.php';
 } else {
