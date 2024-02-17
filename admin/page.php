@@ -3,22 +3,22 @@
     Categories => [Manage | Edit | Update | Add | Insert | Delete | Stats]
 */
 
-$GO = isset($_GET['GO']) ? $_GET['GO'] : 'Manage';
+$do = isset($_GET['do']) ? $_GET['do'] : 'Manage';
 
-if ($GO == 'Manage') {
+if ($do == 'Manage') {
     echo 'Welcome to Manage page';
-    echo '<a href="?GO=Add" >Add CAT + </a>';
-}elseif ($GO == 'Add') {
+    echo '<a href="?do=Add" >Add CAT + </a>';
+}elseif ($do == 'Add') {
     echo 'Welcome to Add page';
-}elseif ($GO == 'Insert') {
+}elseif ($do == 'Insert') {
     echo 'Welcome to Insert page';
-}elseif ($GO == 'Edit') {
+}elseif ($do == 'Edit') {
     echo 'Welcome to Edit page';
-}elseif ($GO == 'Update') {
+}elseif ($do == 'Update') {
     echo 'Welcome to Update page';
-}elseif ($GO == 'Delete') {
+}elseif ($do == 'Delete') {
     echo 'Welcome to Delete page';
-}elseif ($GO == 'Stats') {
+}elseif ($do == 'Stats') {
     echo 'Welcome to Stats page';
 } else {
     echo 'Error There\'s no page with this name';

@@ -14,13 +14,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $hashedPass = sha1($password);
 
     // Check if the user exist in the database
-    $stmt = $dbconc->prepare("SELECT userName, Pass FROM users WHERE userName = ? AND Pass = ? AND GroupID = 1");
+    $stmt = $dbconc->prepare("SELECT userID, userName, Pass
+                                FROM 
+                                    users 
+                                WHERE 
+                                    userName = ? 
+                                AND 
+                                    Pass = ? 
+                                AND 
+                                    GroupID = 1
+                                    LIMIT 1");
     $stmt->execute(array($username, $hashedPass));
+    $row = $stmt->fetch(); //Return data as Array
     $count = $stmt->rowCount();
 
     // If count > 0 this mean the database contain record about this username
     if ($count > 0) {
         $_SESSION['Username'] = $username; // Register session name
+        $_SESSION['ID'] = $row['userID'];
         header('Location: dashboard.php'); // Redirect to dashboard page
         exit();
     }
