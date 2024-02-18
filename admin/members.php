@@ -6,10 +6,42 @@ if (isset($_SESSION['Username'])) {
 
     $do = isset($_GET['do']) ? $_GET['do'] : 'Manage';
     if ($do == 'Manage') {
-        //Start Manage page
-        echo "<h1 class='text-center'>Manage Members</h1>";
-        echo '<a href="members.php?do=Add">Add member</a>';
-    } elseif ($do == 'Add') { ?>
+        $stmt = $dbconc->prepare("SELECT * FROM users WHERE GroupID != 1");
+        $stmt->execute();
+        $rows = $stmt->fetchAll();
+?>
+        <h1 class="text-center">Manage Member</h1>
+        <div class="container">
+            <div class="  table-responsive ">
+                <table class="main-table text-center table table-bordered">
+                    <tr>
+                        <td>#ID</td>
+                        <td>Username</td>
+                        <td>Email</td>
+                        <td>Full Name</td>
+                        <td>Registered Date</td>
+                        <td>Control</td>
+                    </tr>
+                    <?php
+                    foreach ($rows as $row) {
+                        echo "<tr>";
+                        echo "<td>" . $row['userID'] . "</td>";
+                        echo "<td>" . $row['userName'] . "</td>";
+                        echo "<td>" . $row['Email'] . "</td>";
+                        echo "<td>" . $row['Fullname'] . "</td>";
+                        echo "<td>" . "</td>";
+                        echo "<td>
+                            <a href='members.php?do=Edit&ID=" . $row['userID'] . "' class='btn btn-success'><i class='fa fa-edit'></i> Edit</a>
+                            <a href='#' class='btn btn-danger confirm'><i class='fa fa-close'></i> Delete</a>";
+                        echo "</tr>";
+                    }
+                    ?>
+
+                </table>
+            </div>
+            <a href="members.php?do=Add" class="btn btn-primary"><i class="fa fa-plus"></i> Add New Member</a>;
+        </div>
+    <?php } elseif ($do == 'Add') { ?>
         <h1 class="text-center">Add New Member</h1>
         <div class="container">
             <form class="form-horizontal" action="?do=Insert" method="POST">
@@ -107,7 +139,7 @@ if (isset($_SESSION['Username'])) {
                     'email'     => $email,
                     'fullname'  => $fullName
                 ));
-                echo "<div class='alert alert-success'>" .$stmt->rowCount().' Record Inserted </div>';
+                echo "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Inserted </div>';
             }
         } else {
             echo 'You are not authorized to view this page.';
