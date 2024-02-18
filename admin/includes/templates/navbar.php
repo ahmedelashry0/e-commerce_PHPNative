@@ -12,7 +12,7 @@
             <ul class="nav navbar-nav">
                 <li><a href="#"><?php echo lang('CATEGORIES') ?></a></li>
                 <li><a href="#"><?php echo lang('ITEMS') ?></a></li>
-                <li><a href="#"><?php echo lang('MEMBERS') ?></a></li>
+                <li><a href="members.php"><?php echo lang('MEMBERS') ?></a></li>
                 <li><a href="#"><?php echo lang('COMMENTS') ?></a></li>
                 <li><a href="#"><?php echo lang('LOGS') ?></a></li>
             </ul>
