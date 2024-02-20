@@ -22,4 +22,17 @@ function redirectHome($err, $sec = 3){
     echo "<div class='alert alert-danger'>$err</div>";
     echo "<div class='alert alert-info'>You will be directed to Home page after $sec </div>";
     header("refresh:$sec;url=index.php");
+    exit();
+}
+
+/*
+Check if item exists
+*/
+
+function checkItem($select, $from, $value){
+    global $dbconc;
+    $stmt2 = $dbconc->prepare("SELECT $select FROM $from WHERE $select = ?");
+    $stmt2->execute(array($value));
+    $count = $stmt2->rowCount();
+    return $count;
 }

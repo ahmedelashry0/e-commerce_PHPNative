@@ -130,6 +130,11 @@ if (isset($_SESSION['Username'])) {
             }
             if (empty($formErrors)) {
                 // Check if the user is already exist in DB
+                $check= checkItem("userName","users",$userName);
+                if ($check == 1){
+                    $msg = 'Username already exists';
+                    redirectHome($msg);
+                }else{
                 $stmt = $dbconc->prepare("INSERT INTO 
                                             users(userName, Pass, Email, Fullname)
                                             VALUES(:user, :pass, :email, :fullname)");
@@ -140,6 +145,7 @@ if (isset($_SESSION['Username'])) {
                     'fullname'  => $fullName
                 ));
                 echo "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Inserted </div>';
+                }
             }
         } else {
             $msg = 'You are not authorized to view this page.';
