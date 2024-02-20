@@ -18,10 +18,17 @@ Redirect func
 **Error msg
 ** Delay seconds
 */
-function redirectHome($err, $sec = 3){
-    echo "<div class='alert alert-danger'>$err</div>";
-    echo "<div class='alert alert-info'>You will be directed to Home page after $sec </div>";
-    header("refresh:$sec;url=index.php");
+function redirectHome($msg, $url = null, $sec = 3){
+    if ($url === null){
+        $url = 'index.php';
+        $link = 'Homepage';
+    }else{
+        $url = isset($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER'] !== '' ? $_SERVER['HTTP_REFERER'] : 'index.php';
+        $link = 'previous page';
+    }
+    echo $msg;
+    echo "<div class='alert alert-info'>You will be directed to $link after $sec seconds</div>";
+    header("refresh:$sec;url=$url");
     exit();
 }
 

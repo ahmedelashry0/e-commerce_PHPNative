@@ -132,8 +132,8 @@ if (isset($_SESSION['Username'])) {
                 // Check if the user is already exist in DB
                 $check= checkItem("userName","users",$userName);
                 if ($check == 1){
-                    $msg = 'Username already exists';
-                    redirectHome($msg);
+                    $msg = "<div class ='alert alert-danger'>Username already exists</div>";
+                    redirectHome($msg, 'back');
                 }else{
                 $stmt = $dbconc->prepare("INSERT INTO 
                                             users(userName, Pass, Email, Fullname)
@@ -148,7 +148,7 @@ if (isset($_SESSION['Username'])) {
                 }
             }
         } else {
-            $msg = 'You are not authorized to view this page.';
+            $msg = "<div class ='alert alert-danger'>You are not authorized to view this page.</div>";
             redirectHome($msg);
         }
         echo "</div>";
@@ -210,7 +210,7 @@ if (isset($_SESSION['Username'])) {
             </div>
 
 <?php  } else {
-            $msg = 'There is no such ID';
+            $msg = "<div class ='alert alert-danger'>There is no such ID.</div>";
             redirectHome($msg);
         }
     } elseif ($do == 'Update') {
@@ -245,11 +245,12 @@ if (isset($_SESSION['Username'])) {
             if (empty($formErrors)) {
                 $stmt = $dbconc->prepare("UPDATE users SET userName = ? , Email = ? , Fullname = ? , Pass= ? WHERE userID = ?");
                 $stmt->execute(array($userName, $email, $fullName, $password, $id));
-                echo "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record update </div>';
+                $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record update </div>';
+                redirectHome($msg, 'back');
             }
         } else {
-            $msg= 'You are not authorized to view this page.';
-            redirectHome($msg, 6);
+            $msg= "<div class ='alert alert-danger'>You are not authorized to view this page.</div>";
+            redirectHome($msg , 'back');
         }
         echo "</div>";
     }elseif ($do == 'Delete'){
@@ -267,8 +268,8 @@ if (isset($_SESSION['Username'])) {
             $stmt->execute();
             echo "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Deleted </div>';
         }else{
-            $msg= 'Member doesn\'t exist';
-            redirectHome($msg);
+            $msg= "<div class ='alert alert-danger'>Member doesn\'t exist</div>";
+            redirectHome($msg , 'back');
         }
         echo '</div>';
     }
