@@ -12,3 +12,14 @@ function getTitle(){
         echo 'Default';
     }
 }
+
+/*
+Redirect func
+**Error msg
+** Delay seconds
+*/
+function redirectHome($err, $sec = 3){
+    echo "<div class='alert alert-danger'>$err</div>";
+    echo "<div class='alert alert-info'>You will be directed to Home page after $sec </div>";
+    header("refresh:$sec;url=index.php");
+}

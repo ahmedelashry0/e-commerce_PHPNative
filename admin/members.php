@@ -32,7 +32,7 @@ if (isset($_SESSION['Username'])) {
                         echo "<td>" . "</td>";
                         echo "<td>
                             <a href='members.php?do=Edit&ID=" . $row['userID'] . "' class='btn btn-success'><i class='fa fa-edit'></i> Edit</a>
-                            <a href='#' class='btn btn-danger confirm'><i class='fa fa-close'></i> Delete</a>";
+                            <a href='members.php?do=Delete&ID=" . $row['userID'] . "' class='btn btn-danger confirm'><i class='fa fa-close'></i> Delete</a>";
                         echo "</tr>";
                     }
                     ?>
@@ -142,7 +142,8 @@ if (isset($_SESSION['Username'])) {
                 echo "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Inserted </div>';
             }
         } else {
-            echo 'You are not authorized to view this page.';
+            $msg = 'You are not authorized to view this page.';
+            redirectHome($msg);
         }
         echo "</div>";
     } elseif ($do == 'Edit') { //Edit page
@@ -203,7 +204,8 @@ if (isset($_SESSION['Username'])) {
             </div>
 
 <?php  } else {
-            echo 'There is no such ID';
+            $msg = 'There is no such ID';
+            redirectHome($msg);
         }
     } elseif ($do == 'Update') {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -240,9 +242,29 @@ if (isset($_SESSION['Username'])) {
                 echo "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record update </div>';
             }
         } else {
-            echo 'You are not authorized to view this page.';
+            $msg= 'You are not authorized to view this page.';
+            redirectHome($msg, 6);
         }
         echo "</div>";
+    }elseif ($do == 'Delete'){
+        echo '<h1 class="text-center">Delete Member</h1>';
+        echo    '<div class="container">';
+        // Check if id is numeric and get it's integer val
+        $userID = isset($_GET['ID']) && is_numeric($_GET['ID']) ? intval($_GET['ID']) : 0;
+        $stmt = $dbconc->prepare("SELECT * FROM users WHERE userID = ? LIMIT 1");
+        $stmt->execute(array($userID));
+        $count = $stmt->rowCount();
+        // Check if the id exists in DB
+        if ($count > 0) {
+            $stmt = $dbconc->prepare("DELETE FROM users WHERE userID = :userID Limit 1;");
+            $stmt->bindParam(":userID", $userID);
+            $stmt->execute();
+            echo "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Deleted </div>';
+        }else{
+            $msg= 'Member doesn\'t exist';
+            redirectHome($msg);
+        }
+        echo '</div>';
     }
     include $tpl . 'footer.php';
 } else {
