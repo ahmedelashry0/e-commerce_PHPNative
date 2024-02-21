@@ -53,3 +53,12 @@ function checkItem2($item, $from){
     $stmt2->execute();
     return $stmt2->fetchColumn();
 }
+
+// Get items
+function getLatest($select, $from, $order, $limit = 5){
+    global $dbconc;
+    $stmt2 = $dbconc->prepare("SELECT $select FROM $from ORDER BY $order DESC LIMIT $limit");
+    $stmt2->execute();
+    $rows = $stmt2->fetchAll();
+    return $rows;
+}

@@ -15,7 +15,7 @@ if (isset($_SESSION['Username'])) {
             <div class="col-md-3">
                 <div class="stat st-pending">
                     Pending Members
-                    <span><a href="members.php?do=Manage&page=Pending">25</a></span>
+                    <span><a href="members.php?do=Manage&page=Pending"><?php echo checkItem('RegStatus', 'users',0)?></a></span>
                 </div>
             </div>
             <div class="col-md-3">
@@ -37,13 +37,19 @@ if (isset($_SESSION['Username'])) {
             <div class="col-sm-6">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <i class="fa fa-users"></i> Latest Registered Users
+                        <?php $latestUsers = 5; ?>
+                        <i class="fa fa-users"></i> Latest <?php echo $latestUsers; ?> Registered Users
                         <span class="toggle-info pull-right">
                             <i class="fa fa-plus fa-lg"></i>
                         </span>
                     </div>
                     <div class="panel-body">
-                        Test
+                        <?php
+                            $latest = getLatest('*', 'users', 'userID', 5);
+                            foreach ($latest as $late){
+                                echo $late['userName'] . '</br>';
+                            }
+                        ?>
                     </div>
                 </div>
             </div>

@@ -35,7 +35,7 @@ if (isset($_SESSION['Username'])) {
                             <a href='members.php?do=Edit&ID=" . $row['userID'] . "' class='btn btn-success'><i class='fa fa-edit'></i> Edit</a>
                             <a href='members.php?do=Delete&ID=" . $row['userID'] . "' class='btn btn-danger confirm'><i class='fa fa-close'></i> Delete</a>";
                             if ($row['RegStatus'] == 0){
-                                echo "<a href='members.php" . $row['userID'] . "' class='btn btn-info activate'><i class='fa fa-close'></i> Activate</a>";
+                                echo "<a href='members.php?do=Activate&ID=" . $row['userID'] . "' class='btn btn-info activate'><i class='fa fa-toggle-on'></i> Activate</a>";
                             }
                         echo "</tr>";
                     }
@@ -276,6 +276,23 @@ if (isset($_SESSION['Username'])) {
             $stmt->bindParam(":userID", $userID);
             $stmt->execute();
             $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Deleted </div>';
+            redirectHome($msg , 'back');
+        }else{
+            $msg= "<div class ='alert alert-danger'>Member doesn\'t exist</div>";
+            redirectHome($msg );
+        }
+        echo '</div>';
+    }elseif ($do == 'Activate'){
+        echo '<h1 class="text-center">Activate Member</h1>';
+        echo '<div class="container">';
+        // Check if id is numeric and get it's integer val
+        $userID = isset($_GET['ID']) && is_numeric($_GET['ID']) ? intval($_GET['ID']) : 0;
+        $check = checkItem('userID', 'users', $userID);
+        // Check if the id exists in DB
+        if ($check > 0) {
+            $stmt = $dbconc->prepare("UPDATE users SET RegStatus = 1 WHERE userID = ? Limit 1;");
+            $stmt->execute(array($userID));
+            $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Activated </div>';
             redirectHome($msg , 'back');
         }else{
             $msg= "<div class ='alert alert-danger'>Member doesn\'t exist</div>";
