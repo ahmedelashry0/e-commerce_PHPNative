@@ -43,3 +43,13 @@ function checkItem($select, $from, $value){
     $count = $stmt2->rowCount();
     return $count;
 }
+
+/*
+Count number of items
+*/
+function checkItem2($item, $from){
+    global $dbconc;
+    $stmt2 = $dbconc->prepare("SELECT COUNT($item) FROM $from");
+    $stmt2->execute();
+    return $stmt2->fetchColumn();
+}
