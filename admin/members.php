@@ -1,5 +1,4 @@
 <?php
-// TODO check the redirect funcs
 session_start();
 $pageTitle = 'MEMBERS';
 if (isset($_SESSION['Username'])) {
@@ -7,7 +6,8 @@ if (isset($_SESSION['Username'])) {
 
     $do = isset($_GET['do']) ? $_GET['do'] : 'Manage';
     if ($do == 'Manage') {
-        $stmt = $dbconc->prepare("SELECT * FROM users WHERE GroupID != 1");
+        $query = (isset($_GET['page']) && $_GET['page'] == 'Pending') ? ' AND RegStatus = 0' : '';
+        $stmt = $dbconc->prepare("SELECT * FROM users WHERE GroupID != 1 $query");
         $stmt->execute();
         $rows = $stmt->fetchAll();
 ?>
@@ -34,6 +34,9 @@ if (isset($_SESSION['Username'])) {
                         echo "<td>
                             <a href='members.php?do=Edit&ID=" . $row['userID'] . "' class='btn btn-success'><i class='fa fa-edit'></i> Edit</a>
                             <a href='members.php?do=Delete&ID=" . $row['userID'] . "' class='btn btn-danger confirm'><i class='fa fa-close'></i> Delete</a>";
+                            if ($row['RegStatus'] == 0){
+                                echo "<a href='members.php" . $row['userID'] . "' class='btn btn-info activate'><i class='fa fa-close'></i> Activate</a>";
+                            }
                         echo "</tr>";
                     }
                     ?>
@@ -137,8 +140,8 @@ if (isset($_SESSION['Username'])) {
                     redirectHome($msg, 'back');
                 }else{
                 $stmt = $dbconc->prepare("INSERT INTO 
-                                            users(userName, Pass, Email, Fullname, currDate)
-                                            VALUES(:user, :pass, :email, :fullname, now())");
+                                            users(userName, Pass, Email, Fullname,RegStatus, currDate)
+                                            VALUES(:user, :pass, :email, :fullname, 1, now())");
                 $stmt->execute(array(
                     'user'      => $userName,
                     'pass'      => $hashedPass,

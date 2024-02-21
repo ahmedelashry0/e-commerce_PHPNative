@@ -86,9 +86,9 @@ body {
 .home-stats .stat {
     padding: 20px;
     font-size: 15px;
-    color: #fff;
-    border: 1px solid #ccc;
+    color: #EEE;
     position: relative;
+    border-radius: 10px;
     /* overflow: hidden; */
 }
 

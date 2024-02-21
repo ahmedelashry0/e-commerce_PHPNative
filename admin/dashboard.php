@@ -7,25 +7,25 @@ if (isset($_SESSION['Username'])) {
         <h1> Dashboard</h1>
         <div class="row">
             <div class="col-md-3">
-                <div class="stat">
+                <div class="stat st-members">
                     Total Members
-                    <span><?php echo checkItem2('userID', 'users') ?></span>
+                    <span><a href="members.php"> <?php echo checkItem2('userID', 'users') ?></a></span></span>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="stat">
+                <div class="stat st-pending">
                     Pending Members
-                    <span>25</span>
+                    <span><a href="members.php?do=Manage&page=Pending">25</a></span>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="stat">
+                <div class="stat st-items">
                     Total Items
                     <span>200</span>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="stat">
+                <div class="stat st-comments">
                     Total Comments
                     <span>200</span>
                 </div>
