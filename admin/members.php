@@ -1,4 +1,5 @@
 <?php
+// TODO check the redirect funcs
 session_start();
 $pageTitle = 'MEMBERS';
 if (isset($_SESSION['Username'])) {
@@ -29,7 +30,7 @@ if (isset($_SESSION['Username'])) {
                         echo "<td>" . $row['userName'] . "</td>";
                         echo "<td>" . $row['Email'] . "</td>";
                         echo "<td>" . $row['Fullname'] . "</td>";
-                        echo "<td>" . "</td>";
+                        echo "<td>" . $row['currDate'] ."</td>";
                         echo "<td>
                             <a href='members.php?do=Edit&ID=" . $row['userID'] . "' class='btn btn-success'><i class='fa fa-edit'></i> Edit</a>
                             <a href='members.php?do=Delete&ID=" . $row['userID'] . "' class='btn btn-danger confirm'><i class='fa fa-close'></i> Delete</a>";
@@ -136,20 +137,23 @@ if (isset($_SESSION['Username'])) {
                     redirectHome($msg, 'back');
                 }else{
                 $stmt = $dbconc->prepare("INSERT INTO 
-                                            users(userName, Pass, Email, Fullname)
-                                            VALUES(:user, :pass, :email, :fullname)");
+                                            users(userName, Pass, Email, Fullname, currDate)
+                                            VALUES(:user, :pass, :email, :fullname, now())");
                 $stmt->execute(array(
                     'user'      => $userName,
                     'pass'      => $hashedPass,
                     'email'     => $email,
                     'fullname'  => $fullName
                 ));
-                echo "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Inserted </div>';
+                $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Inserted </div>';
+                redirectHome($msg, 'back');
                 }
             }
         } else {
+            echo "<div class ='container'>";
             $msg = "<div class ='alert alert-danger'>You are not authorized to view this page.</div>";
             redirectHome($msg);
+            echo "</div>";
         }
         echo "</div>";
     } elseif ($do == 'Edit') { //Edit page
@@ -210,8 +214,10 @@ if (isset($_SESSION['Username'])) {
             </div>
 
 <?php  } else {
+            echo "<div class ='container'>";
             $msg = "<div class ='alert alert-danger'>There is no such ID.</div>";
             redirectHome($msg);
+            echo "</div>";
         }
     } elseif ($do == 'Update') {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -249,8 +255,10 @@ if (isset($_SESSION['Username'])) {
                 redirectHome($msg, 'back');
             }
         } else {
+            echo "<div class ='container'>";
             $msg= "<div class ='alert alert-danger'>You are not authorized to view this page.</div>";
             redirectHome($msg , 'back');
+            echo "</div>";
         }
         echo "</div>";
     }elseif ($do == 'Delete'){
@@ -258,18 +266,17 @@ if (isset($_SESSION['Username'])) {
         echo    '<div class="container">';
         // Check if id is numeric and get it's integer val
         $userID = isset($_GET['ID']) && is_numeric($_GET['ID']) ? intval($_GET['ID']) : 0;
-        $stmt = $dbconc->prepare("SELECT * FROM users WHERE userID = ? LIMIT 1");
-        $stmt->execute(array($userID));
-        $count = $stmt->rowCount();
+        $check = checkItem('userID', 'users', $userID);
         // Check if the id exists in DB
-        if ($count > 0) {
+        if ($check > 0) {
             $stmt = $dbconc->prepare("DELETE FROM users WHERE userID = :userID Limit 1;");
             $stmt->bindParam(":userID", $userID);
             $stmt->execute();
-            echo "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Deleted </div>';
+            $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Deleted </div>';
+            redirectHome($msg , 'back');
         }else{
             $msg= "<div class ='alert alert-danger'>Member doesn\'t exist</div>";
-            redirectHome($msg , 'back');
+            redirectHome($msg );
         }
         echo '</div>';
     }
