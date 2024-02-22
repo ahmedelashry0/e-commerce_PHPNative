@@ -1,4 +1,5 @@
 <?php
+ob_start();
 session_start();
 if (isset($_SESSION['Username'])) {
     $pageTitle = 'Dashboard';
@@ -89,3 +90,6 @@ if (isset($_SESSION['Username'])) {
     header('Location: index.php'); // Redirect to dashboard page
     exit();
 }
+
+ob_end_flush();
+?>
