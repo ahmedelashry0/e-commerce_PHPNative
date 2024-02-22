@@ -15,7 +15,7 @@ if (isset($_SESSION['Username'])) {
             <div class="col-md-3">
                 <div class="stat st-pending">
                     Pending Members
-                    <span><a href="members.php?do=Manage&page=Pending"><?php echo checkItem('RegStatus', 'users',0)?></a></span>
+                    <span><a href="members.php?do=Manage&page=Pending"><?php echo checkItem('RegStatus', 'users', 0) ?></a></span>
                 </div>
             </div>
             <div class="col-md-3">
@@ -44,12 +44,27 @@ if (isset($_SESSION['Username'])) {
                         </span>
                     </div>
                     <div class="panel-body">
-                        <?php
+                        <ul class="list-unstyled latest-users">
+                            <?php
                             $latest = getLatest('*', 'users', 'userID', 5);
-                            foreach ($latest as $late){
-                                echo $late['userName'] . '</br>';
+                            foreach ($latest as $late) {
+                                echo '<li>';
+                                echo $late['userName'];
+                                echo '<a href="members.php?do=Edit&userid=' . $late['userID'] . '">';
+                                echo '<span class="btn btn-success pull-right">';
+                                echo '<i class="fa fa-edit"></i> Edit';
+                                if ($late['RegStatus'] == 0) {
+                                    echo "<a 
+																	href='members.php?do=Activate&userid=" . $late['userID'] . "' 
+																	class='btn btn-info pull-right activate'>
+																	<i class='fa fa-toggle-on'></i> Activate</a>";
+                                }
+                                echo '</span>';
+                                echo '</a>';
+                                echo '</li>';
                             }
-                        ?>
+                            ?>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -68,7 +83,7 @@ if (isset($_SESSION['Username'])) {
             </div>
         </div>
     </div>
-<?php
+    <?php
     include $tpl . 'footer.php';
 } else {
     header('Location: index.php'); // Redirect to dashboard page
