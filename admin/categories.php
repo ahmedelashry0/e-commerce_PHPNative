@@ -10,8 +10,81 @@ if (isset($_SESSION['Username'])) {
     $do = isset($_GET['do']) ? $_GET['do'] : 'Manage';
 
     if ($do == 'Manage') {
-        echo 'Welcome';
+//        $sort = 'asc';
+        $sort_array = array('asc', 'desc');
+        $sort = isset($_GET['sort']) && in_array($_GET['sort'] , $sort_array) ? $sort = $_GET['sort'] : 'asc';
+        $stmt = $dbconc->prepare("SELECT * FROM categories ORDER BY ordering $sort");
+        $stmt->execute();
+        $cats = $stmt->fetchAll();
+        if (! empty($cats)) {
 
+            ?>
+
+            <h1 class="text-center">Manage Categories</h1>
+            <div class="container categories">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <i class="fa fa-edit"></i> Manage Categories
+                        <div class="option pull-right">
+                            <i class="fa fa-sort"></i> Ordering: [
+                            <a class="<?php if ($sort == 'asc') { echo 'active'; } ?>" href="?sort=asc">Asc</a> |
+                            <a class="<?php if ($sort == 'desc') { echo 'active'; } ?>" href="?sort=desc">Desc</a> ]
+                            <i class="fa fa-eye"></i> View: [
+                            <span class="active" data-view="full">Full</span> |
+                            <span data-view="classic">Classic</span> ]
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <?php
+                        foreach($cats as $cat) {
+                            echo "<div class='cat'>";
+                            echo "<div class='hidden-buttons'>";
+                            echo "<a href='categories.php?do=Edit&catid=" . $cat['catID'] . "' class='btn btn-xs btn-primary'><i class='fa fa-edit'></i> Edit</a>";
+                            echo "<a href='categories.php?do=Delete&catid=" . $cat['catID'] . "' class='confirm btn btn-xs btn-danger'><i class='fa fa-close'></i> Delete</a>";
+                            echo "</div>";
+                            echo "<h3>" . $cat['catName'] . '</h3>';
+                            echo "<div class='full-view'>";
+                            echo "<p>"; if($cat['catDescription'] == '') { echo 'This category has no description'; } else { echo $cat['catDescription']; } echo "</p>";
+                            if($cat['visibility'] == 1) { echo '<span class="visibility cat-span"><i class="fa fa-eye"></i> Hidden</span>'; }
+                            if($cat['Allow_comments'] == 1) { echo '<span class="commenting cat-span"><i class="fa fa-close"></i> Comment Disabled</span>'; }
+                            if($cat['Allow_Ads'] == 1) { echo '<span class="advertises cat-span"><i class="fa fa-close"></i> Ads Disabled</span>'; }
+                            echo "</div>";
+
+                            // Get Child Categories
+//                            $childCats = getAllFrom("*", "categories", "where parent = {$cat['catID']}", "", "ID", "ASC");
+//                            if (! empty($childCats)) {
+//                                echo "<h4 class='child-head'>Child Categories</h4>";
+//                                echo "<ul class='list-unstyled child-cats'>";
+//                                foreach ($childCats as $c) {
+//                                    echo "<li class='child-link'>
+//												<a href='categories.php?do=Edit&catid=" . $c['ID'] . "'>" . $c['Name'] . "</a>
+//												<a href='categories.php?do=Delete&catid=" . $c['ID'] . "' class='show-delete confirm'> Delete</a>
+//											</li>";
+//                                }
+//                                echo "</ul>";
+//                            }
+
+                            echo "</div>";
+                            echo "<hr>";
+                        }
+                        ?>
+                    </div>
+                </div>
+                <a class="add-category btn btn-primary" href="categories.php?do=Add"><i class="fa fa-plus"></i> Add New Category</a>
+            </div>
+
+        <?php } else {
+
+            echo '<div class="container">';
+            echo '<div class="nice-message">There\'s No Categories To Show</div>';
+            echo '<a href="categories.php?do=Add" class="btn btn-primary">
+							<i class="fa fa-plus"></i> New Category
+						</a>';
+            echo '</div>';
+
+        } ?>
+
+        <?php
     } elseif ($do == 'Add') { ?>
         <h1 class="text-center">Add New Categories</h1>
         <div class="container">
