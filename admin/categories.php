@@ -26,7 +26,7 @@ if (isset($_SESSION['Username'])) {
                 <!-- End Username Field -->
                 <!-- Start Description Field -->
                 <div class="form-group form-group-lg">
-                    <label class="col-sm-2 control-label">Password</label>
+                    <label class="col-sm-2 control-label">Description</label>
                     <div class="col-sm-10 col-md-6">
                         <input type="text" name="description" class=" form-control" placeholder="Describe the categorie" />
                     </div>
@@ -34,9 +34,9 @@ if (isset($_SESSION['Username'])) {
                 <!-- End Description Field -->
                 <!-- Start Ordering Field -->
                 <div class="form-group form-group-lg">
-                    <label class="col-sm-2 control-label">Email</label>
+                    <label class="col-sm-2 control-label">Arrange</label>
                     <div class="col-sm-10 col-md-6">
-                        <input type="text" name="ordering" class="form-control" placeholder="Number to arrange the categorie" />
+                        <input type="number" name="ordering" class="form-control" placeholder="Number to arrange the categorie" />
                     </div>
                 </div>
                 <!-- End Ordering Field -->
@@ -97,7 +97,45 @@ if (isset($_SESSION['Username'])) {
         <?php
 
     } elseif ($do == 'Insert') {
-
+        //Start Insert page
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            echo "<h1 class='text-center'>Add Categorie</h1>";
+            echo "<div class='container'>";
+            $catName            = $_POST['catName'];
+            $description        = $_POST['description'];
+            $order              = $_POST['ordering'];
+            $visibility         = $_POST['visibility'];
+            $commenting         = $_POST['commenting'];
+            $Ads                = $_POST['ads'];
+            if (!empty($catName)) {
+                // Check if the categorie is already exist in DB
+                $check= checkItem("catName","categories",$catName);
+                if ($check == 1){
+                    $msg = "<div class ='alert alert-danger'>Categorie Name already exists</div>";
+                    redirectHome($msg, 'back');
+                }else{
+                    $stmt = $dbconc->prepare("INSERT INTO 
+                                            categories(catName, catDescription, ordering, visibility,Allow_comments, Allow_Ads)
+                                            VALUES(:cat, :des, :order, :visibility, :com, :ads)");
+                    $stmt->execute(array(
+                        'cat'           => $catName,
+                        'des'           => $description,
+                        'order'         => empty($order) ? Null : $order,
+                        'visibility'    => $visibility,
+                        'com'           => $commenting,
+                        'ads'           => $Ads
+                    ));
+                    $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Inserted </div>';
+                    redirectHome($msg, 'back');
+                }
+            }
+        } else {
+            echo "<div class ='container'>";
+            $msg = "<div class ='alert alert-danger'>You are not authorized to view this page.</div>";
+            redirectHome($msg);
+            echo "</div>";
+        }
+        echo "</div>";
 
     } elseif ($do == 'Edit') {
 
