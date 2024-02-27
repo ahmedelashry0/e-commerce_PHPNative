@@ -51,7 +51,7 @@ if (isset($_SESSION['Username'])) {
                             foreach ($latest as $late) {
                                 echo '<li>';
                                 echo $late['userName'];
-                                echo '<a href="members.php?do=Edit&userid=' . $late['userID'] . '">';
+                                echo '<a href="members.php?do=Edit&ID=' . $late['userID'] . '">';
                                 echo '<span class="btn btn-success pull-right">';
                                 echo '<i class="fa fa-edit"></i> Edit';
                                 if ($late['RegStatus'] == 0) {
