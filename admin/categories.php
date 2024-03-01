@@ -19,7 +19,6 @@ if (isset($_SESSION['Username'])) {
         if (!empty($cats)) {
 
             ?>
-
             <h1 class="text-center">Manage Categories</h1>
             <div class="container categories">
                 <div class="panel panel-default">
@@ -351,20 +350,20 @@ if (isset($_SESSION['Username'])) {
             $ads = $_POST['ads'];
             // Validate the form
             $stmt = $dbconc->prepare("UPDATE categories SET catName = ? , catDescription = ? , ordering = ? , visibility= ? , Allow_comments = ?, Allow_Ads = ? WHERE catID = ?");
-            $stmt->execute(array($catName, $desc, $order, $visible,$comment, $ads, $id));
+            $stmt->execute(array($catName, $desc, $order, $visible, $comment, $ads, $id));
             $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record update </div>';
             redirectHome($msg, 'back');
         } else {
             echo "<div class ='container'>";
-            $msg= "<div class ='alert alert-danger'>You are not authorized to view this page.</div>";
-            redirectHome($msg , 'back');
+            $msg = "<div class ='alert alert-danger'>You are not authorized to view this page.</div>";
+            redirectHome($msg, 'back');
             echo "</div>";
         }
         echo "</div>";
 
     } elseif ($do == 'Delete') {
         echo '<h1 class="text-center">Delete Categories</h1>';
-        echo    '<div class="container">';
+        echo '<div class="container">';
         // Check if id is numeric and get it's integer val
         $catID = isset($_GET['catID']) && is_numeric($_GET['catID']) ? intval($_GET['catID']) : 0;
         $check = checkItem('catID', 'categories', $catID);
@@ -374,10 +373,10 @@ if (isset($_SESSION['Username'])) {
             $stmt->bindParam(":catID", $catID);
             $stmt->execute();
             $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Deleted </div>';
-            redirectHome($msg , 'back');
-        }else{
-            $msg= "<div class ='alert alert-danger'>Categorie doesn\'t exist</div>";
-            redirectHome($msg );
+            redirectHome($msg, 'back');
+        } else {
+            $msg = "<div class ='alert alert-danger'>Categorie doesn\'t exist</div>";
+            redirectHome($msg);
         }
         echo '</div>';
 
