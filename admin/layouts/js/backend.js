@@ -1,5 +1,13 @@
 $(function () {
     "use strict";
+    // Trigger The Selectboxit
+
+    $("select").selectBoxIt({
+
+        autoWidth: false,
+        theme : "bootstrap"
+
+    });
 
     $("[placeholder]")
         .focus(function () {
@@ -28,7 +36,7 @@ $(function () {
     );
 
     //Categorie view option
-    $('.confirm').click(function(){
+    $('.confirm').click(function () {
         return confirm('Are you sure');
     })
 
