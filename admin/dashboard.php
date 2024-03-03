@@ -10,7 +10,7 @@ if (isset($_SESSION['Username'])) {
             <div class="col-md-3">
                 <div class="stat st-members">
                     Total Members
-                    <span><a href="members.php"> <?php echo checkItem2('userID', 'users') ?></a></span></span>
+                    <span><a href="members.php"> <?php echo checkItem2('userID', 'users') ?></a></span>
                 </div>
             </div>
             <div class="col-md-3">
@@ -22,7 +22,7 @@ if (isset($_SESSION['Username'])) {
             <div class="col-md-3">
                 <div class="stat st-items">
                     Total Items
-                    <span>200</span>
+                    <span><a href="items.php"> <?php echo checkItem2('itemID', 'items') ?></a></span>
                 </div>
             </div>
             <div class="col-md-3">
