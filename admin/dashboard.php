@@ -9,26 +9,38 @@ if (isset($_SESSION['Username'])) {
         <div class="row">
             <div class="col-md-3">
                 <div class="stat st-members">
-                    Total Members
-                    <span><a href="members.php"> <?php echo checkItem2('userID', 'users') ?></a></span>
+                    <i class="fa fa-users"></i>
+                    <div class="info">
+                        Total Members
+                        <span><a href="members.php"> <?php echo checkItem2('userID', 'users') ?></a></span>
+                    </div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat st-pending">
-                    Pending Members
-                    <span><a href="members.php?do=Manage&page=Pending"><?php echo checkItem('RegStatus', 'users', 0) ?></a></span>
+                    <i class="fa fa-user-plus"></i>
+                    <div class="info">
+                        Pending Members
+                        <span><a href="members.php?do=Manage&page=Pending"><?php echo checkItem('RegStatus', 'users', 0) ?></a></span>
+                    </div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat st-items">
-                    Total Items
-                    <span><a href="items.php"> <?php echo checkItem2('itemID', 'items') ?></a></span>
+                    <i class="fa fa-tag"></i>
+                    <div class="info">
+                        Total Items
+                        <span><a href="items.php"> <?php echo checkItem2('itemID', 'items') ?></a></span>
+                    </div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat st-comments">
-                    Total Comments
-                    <span>200</span>
+                    <i class="fa fa-comments"></i>
+                    <div class="info">
+                        Total Comments
+                        <span>200</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -58,7 +70,7 @@ if (isset($_SESSION['Username'])) {
                                     echo "<a 
 																	href='members.php?do=Activate&userid=" . $late['userID'] . "' 
 																	class='btn btn-info pull-right activate'>
-																	<i class='fa fa-toggle-on'></i> Activate</a>";
+																	<i class='fa fa-check'></i> Activate</a>";
                                 }
                                 echo '</span>';
                                 echo '</a>';
@@ -72,13 +84,34 @@ if (isset($_SESSION['Username'])) {
             <div class="col-sm-6">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <i class="fa fa-tag"></i> Latest Items
+                        <?php $numItems = 5; ?>
+                        <i class="fa fa-tag"></i> Latest <?php echo $numItems; ?>  Items
                         <span class="toggle-info pull-right">
                             <i class="fa fa-plus fa-lg"></i>
                         </span>
                     </div>
                     <div class="panel-body">
-                        Test
+                        <ul class="list-unstyled latest-users">
+                        <?php
+                        $latestItems = getLatest('*', 'items', 'itemID', 5);
+                        foreach ($latestItems as $lateItem) {
+                            echo '<li>';
+                            echo $lateItem['Name'];
+                            echo '<a href="items.php?do=Edit&itemID=' . $lateItem['itemID'] . '">';
+                            echo '<span class="btn btn-success pull-right">';
+                            echo '<i class="fa fa-edit"></i> Edit';
+                            if ($lateItem['Approve'] == 0) {
+                                echo "<a 
+                                        href='items.php?do=Approve&itemID=" . $lateItem['itemID'] . "' 
+                                        class='btn btn-info pull-right activate'>
+                                        <i class='fa fa-check'></i> Approve</a>";
+                            }
+                            echo '</span>';
+                            echo '</a>';
+                            echo '</li>';
+                        }
+                        ?>
+                        </ul>
                     </div>
                 </div>
             </div>

@@ -55,6 +55,9 @@ if (isset($_SESSION['Username'])) {
                         echo "<td>
                             <a href='items.php?do=Edit&itemID=" . $item['itemID'] . "' class='btn btn-success'><i class='fa fa-edit'></i> Edit</a>
                             <a href='items.php?do=Delete&itemID=" . $item['itemID'] . "' class='btn btn-danger confirm'><i class='fa fa-close'></i> Delete</a>";
+                        if ($item['Approve'] == 0){
+                            echo "<a href='items.php?do=Approve&itemID=" . $item['itemID'] . "' class='btn btn-info activate'><i class='fa fa-check'></i> Approve</a>";
+                        }
                         echo "</tr>";
                     }
                     ?>
@@ -431,10 +434,40 @@ if (isset($_SESSION['Username'])) {
         echo "</div>";
 
     } elseif ($do == 'Delete') {
-
+        echo '<h1 class="text-center">Delete Item</h1>';
+        echo    '<div class="container">';
+        // Check if id is numeric and get it's integer val
+        $itemID = isset($_GET['itemID']) && is_numeric($_GET['itemID']) ? intval($_GET['itemID']) : 0;
+        $check = checkItem('itemID', 'items', $itemID);
+        // Check if the id exists in DB
+        if ($check > 0) {
+            $stmt = $dbconc->prepare("DELETE FROM items WHERE itemID = :zitemID Limit 1;");
+            $stmt->bindParam(":zitemID", $itemID);
+            $stmt->execute();
+            $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Deleted </div>';
+            redirectHome($msg , 'back');
+        }else{
+            $msg= "<div class ='alert alert-danger'>Item doesn\'t exist</div>";
+            redirectHome($msg );
+        }
 
     } elseif ($do == 'Approve') {
-
+        echo '<h1 class="text-center">Approve Item</h1>';
+        echo '<div class="container">';
+        // Check if id is numeric and get it's integer val
+        $itemID = isset($_GET['itemID']) && is_numeric($_GET['itemID']) ? intval($_GET['itemID']) : 0;
+        $check = checkItem('itemID', 'items', $itemID);
+        // Check if the id exists in DB
+        if ($check > 0) {
+            $stmt = $dbconc->prepare("UPDATE items SET Approve = 1 WHERE itemID = ? Limit 1;");
+            $stmt->execute(array($itemID));
+            $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Approved </div>';
+            redirectHome($msg , 'back');
+        }else{
+            $msg= "<div class ='alert alert-danger'>Item doesn\'t exist</div>";
+            redirectHome($msg );
+        }
+        echo '</div>';
 
     }
 
