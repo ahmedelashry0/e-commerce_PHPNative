@@ -63,44 +63,11 @@ if (isset($_SESSION['Username'])) {
                     <div class="form-group form-group-lg">
                         <label class="col-sm-2 control-label">Comment</label>
                         <div class="col-sm-10 col-md-5">
-                            <input type="text" name="comment" class="form-control" value="<?php echo $row['comment'] ?>"" />
+                            <textarea class="form-control" name="comment" ><?php echo $row['comment'] ?></textarea>
                         </div>
                     </div>
                     <!-- End comment Field -->
-                   <!-- Start Items Field -->
-                    <div class="form-group form-group-lg">
-                        <label class="col-sm-2 control-label">Items</label>
-                        <div class="col-sm-10 col-md-6">
-                            <select name = "items">
-                                <?php
-                                $stmt = $dbconc->prepare("SELECT * FROM items");
-                                $stmt->execute();
-                                $items = $stmt->fetchAll();
-                                foreach ($items as $item){
-                                    echo "<option value='" . $item['itemID'] . "'" . ($row['item_id'] == $item['itemID'] ? ' selected' : '') . ">" . $item['Name'] . "</option>";
-                                }
-                                ?>
-                            </select>
-                        </div>
-                    </div>
-                    <!-- End Items Field -->
-                    <!-- Start Members Field -->
-                    <div class="form-group form-group-lg">
-                        <label class="col-sm-2 control-label">Username</label>
-                        <div class="col-sm-10 col-md-6">
-                            <select name = "users">
-                                <?php
-                                $stmt = $dbconc->prepare("SELECT * FROM users");
-                                $stmt->execute();
-                                $users = $stmt->fetchAll();
-                                foreach ($users as $user){
-                                    echo "<option value='" . $user['userID'] . "'" . ($row['user_id'] == $user['userID'] ? ' selected' : '') . ">" . $user['userName'] . "</option>";
-                                }
-                                ?>
-                            </select>
-                        </div>
-                    </div>
-                    <!-- End Members Field -->
+
                     <!-- Start Submit Field -->
                     <div class="form-group form-group-lg">
                         <div class="col-sm-offset-2 col-sm-10">
@@ -123,34 +90,10 @@ if (isset($_SESSION['Username'])) {
             echo "<div class='container'>";
             $id = $_POST['commentID'];
             $comment = $_POST['comment'];
-            $item_id = $_POST['items'];
-            $user_id = $_POST['users'];
-//            // Validate the form
-//            $formErrors = array();
-//            if (strlen($userName) < 4) {
-//                $formErrors[] = 'Username can\'t be less than <strong>4 characters</strong>';
-//            }
-//            if (strlen($userName) > 20) {
-//                $formErrors[] = 'Username can\'t be more than <strong>20 characters</strong>';
-//            }
-//            if (empty($userName)) {
-//                $formErrors[] = 'Username can\'t be <strong>empty</strong>';
-//            }
-//            if (empty($email)) {
-//                $formErrors[] = 'Email can\'t be <strong>empty</strong>';
-//            }
-//            if (empty($fullName)) {
-//                $formErrors[] = 'Full Name can\'t be <strong>empty</strong>';
-//            }
-//            foreach ($formErrors as $error) {
-//                echo  '<div class="alert alert-danger">' . $error . '</div>';
-//            }
-//            if (empty($formErrors)) {
-                $stmt = $dbconc->prepare("UPDATE comments SET comment = ? , item_id = ? , user_id = ?  WHERE c_id = ?");
-                $stmt->execute(array( $comment, $item_id, $user_id, $id));
+                $stmt = $dbconc->prepare("UPDATE comments SET comment = ?   WHERE c_id = ?");
+                $stmt->execute(array( $comment, $id));
                 $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record update </div>';
                 redirectHome($msg, 'back');
-//            }
         } else {
             echo "<div class ='container'>";
             $msg= "<div class ='alert alert-danger'>You are not authorized to view this page.</div>";
@@ -159,37 +102,37 @@ if (isset($_SESSION['Username'])) {
         }
         echo "</div>";
     }elseif ($do == 'Delete'){
-        echo '<h1 class="text-center">Delete Member</h1>';
+        echo '<h1 class="text-center">Delete comment</h1>';
         echo    '<div class="container">';
         // Check if id is numeric and get it's integer val
-        $userID = isset($_GET['ID']) && is_numeric($_GET['ID']) ? intval($_GET['ID']) : 0;
-        $check = checkItem('userID', 'users', $userID);
+        $commentID = isset($_GET['comID']) && is_numeric($_GET['comID']) ? intval($_GET['comID']) : 0;
+        $check = checkItem('c_id', 'comments', $commentID);
         // Check if the id exists in DB
         if ($check > 0) {
-            $stmt = $dbconc->prepare("DELETE FROM users WHERE userID = :userID Limit 1;");
-            $stmt->bindParam(":userID", $userID);
+            $stmt = $dbconc->prepare("DELETE FROM comments WHERE c_id = :comID Limit 1;");
+            $stmt->bindParam(":comID", $commentID);
             $stmt->execute();
             $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Deleted </div>';
             redirectHome($msg , 'back');
         }else{
-            $msg= "<div class ='alert alert-danger'>Member doesn\'t exist</div>";
+            $msg= "<div class ='alert alert-danger'>Comment doesn\'t exist</div>";
             redirectHome($msg );
         }
         echo '</div>';
-    }elseif ($do == 'Activate'){
-        echo '<h1 class="text-center">Activate Member</h1>';
+    }elseif ($do == 'Approve'){
+        echo '<h1 class="text-center">Approve comment</h1>';
         echo '<div class="container">';
         // Check if id is numeric and get it's integer val
-        $userID = isset($_GET['ID']) && is_numeric($_GET['ID']) ? intval($_GET['ID']) : 0;
-        $check = checkItem('userID', 'users', $userID);
+        $commentID = isset($_GET['comID']) && is_numeric($_GET['comID']) ? intval($_GET['comID']) : 0;
+        $check = checkItem('c_id', 'comments', $commentID);
         // Check if the id exists in DB
         if ($check > 0) {
-            $stmt = $dbconc->prepare("UPDATE users SET RegStatus = 1 WHERE userID = ? Limit 1;");
-            $stmt->execute(array($userID));
-            $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Activated </div>';
+            $stmt = $dbconc->prepare("UPDATE comments SET status = 1 WHERE c_id = ? Limit 1;");
+            $stmt->execute(array($commentID));
+            $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Approved </div>';
             redirectHome($msg , 'back');
         }else{
-            $msg= "<div class ='alert alert-danger'>Member doesn\'t exist</div>";
+            $msg= "<div class ='alert alert-danger'>Comment doesn\'t exist</div>";
             redirectHome($msg );
         }
         echo '</div>';
