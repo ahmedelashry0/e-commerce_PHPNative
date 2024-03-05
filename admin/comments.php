@@ -45,6 +45,8 @@ if (isset($_SESSION['Username'])) {
                     ?>
 
                 </table>
+            </div>
+        </div>
     <?php } elseif ($do == 'Edit') { //Edit page
         // Check if id is numeric and get it's integer val
         $comID = isset($_GET['comID']) && is_numeric($_GET['comID']) ? intval($_GET['comID']) : 0;

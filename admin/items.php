@@ -254,7 +254,7 @@ if (isset($_SESSION['Username'])) {
         $count = $stmt->rowCount();
         // Check if the id exists in DB
         if ($count > 0) { ?>
-            <h1 class="text-center">Add New Items</h1>
+            <h1 class="text-center">Edit Items</h1>
             <div class="container">
                 <form class="form-horizontal" action="?do=Update" method="POST">
                     <input type="hidden" name="itemID" value="<?php echo $itemID; ?>">
@@ -358,15 +358,51 @@ if (isset($_SESSION['Username'])) {
                     <!-- Start Submit Field -->
                     <div class="form-group form-group-lg">
                         <div class="col-sm-offset-2 col-sm-10">
-                            <input type="submit" value="Add item" class="btn btn-primary btn-sm"/>
+                            <input type="submit" value="Edit item" class="btn btn-primary btn-sm"/>
                         </div>
                     </div>
                     <!-- End Submit Field -->
                 </form>
+            <?php
+            $stmt = $dbconc->prepare("SELECT comments.* , users.userName AS userName FROM comments
+                                                INNER JOIN users
+                                                ON users.userID = comments.user_id
+                                                where item_id = ?");
+            $stmt->execute(array($itemID));
+            $rows = $stmt->fetchAll();
+            if (!empty($rows)) {
+            ?>
+            <h1 class="text-center">Manage [<?php echo $item['Name'] ?>] comments</h1>
+            <div class="  table-responsive ">
+                <table class="main-table text-center table table-bordered">
+                    <tr>
+                        <td>Comment</td>
+                        <td>User name</td>
+                        <td>Registered Date</td>
+                        <td>Control</td>
+                    </tr>
+                    <?php
+                    foreach ($rows as $row) {
+                        echo "<tr>";
+                        echo "<td>" . $row['comment'] . "</td>";
+                        echo "<td>" . $row['userName'] . "</td>";
+                        echo "<td>" . $row['comment_date'] ."</td>";
+                        echo "<td>
+                            <a href='comments.php?do=Edit&comID=" . $row['c_id'] . "' class='btn btn-success'><i class='fa fa-edit'></i> Edit</a>
+                            <a href='comments.php?do=Delete&comID=" . $row['c_id'] . "' class='btn btn-danger confirm'><i class='fa fa-close'></i> Delete</a>";
+                        if ($row['status'] == 0){
+                            echo "<a href='comments.php?do=Approve&comID=" . $row['c_id'] . "' class='btn btn-info activate'><i class='fa fa-check'></i> Approve</a>";
+                        }
+                        echo "</tr>";
+                    }
+                    ?>
+
+                </table>
             </div>
 
 
-        <?php  } else {
+        <?php }
+            } else {
             echo "<div class ='container'>";
             $msg = "<div class ='alert alert-danger'>There is no such ID.</div>";
             redirectHome($msg);
@@ -475,7 +511,7 @@ if (isset($_SESSION['Username'])) {
 
 } else {
 
-    header('Location: index.php');
+    header('Location:index.php');
 
     exit();
 }
