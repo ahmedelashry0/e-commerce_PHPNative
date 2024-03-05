@@ -3,7 +3,9 @@ ob_start();
 session_start();
 if (isset($_SESSION['Username'])) {
     $pageTitle = 'Dashboard';
-    include 'init.php'; ?>
+    include 'init.php';
+    $numComments = 4;
+    ?>
     <div class="container home-stats text-center">
         <h1> Dashboard</h1>
         <div class="row">
@@ -81,40 +83,86 @@ if (isset($_SESSION['Username'])) {
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <?php $numItems = 5; ?>
-                        <i class="fa fa-tag"></i> Latest <?php echo $numItems; ?>  Items
-                        <span class="toggle-info pull-right">
-                            <i class="fa fa-plus fa-lg"></i>
-                        </span>
-                    </div>
-                    <div class="panel-body">
-                        <ul class="list-unstyled latest-users">
-                        <?php
-                        $latestItems = getLatest('*', 'items', 'itemID', 5);
-                        foreach ($latestItems as $lateItem) {
-                            echo '<li>';
-                            echo $lateItem['Name'];
-                            echo '<a href="items.php?do=Edit&itemID=' . $lateItem['itemID'] . '">';
-                            echo '<span class="btn btn-success pull-right">';
-                            echo '<i class="fa fa-edit"></i> Edit';
-                            if ($lateItem['Approve'] == 0) {
-                                echo "<a 
-                                        href='items.php?do=Approve&itemID=" . $lateItem['itemID'] . "' 
-                                        class='btn btn-info pull-right activate'>
-                                        <i class='fa fa-check'></i> Approve</a>";
+                <div class="col-sm-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <?php $numItems = 5; ?>
+                            <i class="fa fa-tag"></i> Latest <?php echo $numItems; ?>  Items
+                            <span class="toggle-info pull-right">
+                                <i class="fa fa-plus fa-lg"></i>
+                            </span>
+                        </div>
+                        <div class="panel-body">
+                            <ul class="list-unstyled latest-users">
+                            <?php
+                            $latestItems = getLatest('*', 'items', 'itemID', 5);
+                            foreach ($latestItems as $lateItem) {
+                                echo '<li>';
+                                echo $lateItem['Name'];
+                                echo '<a href="items.php?do=Edit&itemID=' . $lateItem['itemID'] . '">';
+                                echo '<span class="btn btn-success pull-right">';
+                                echo '<i class="fa fa-edit"></i> Edit';
+                                if ($lateItem['Approve'] == 0) {
+                                    echo "<a 
+                                            href='items.php?do=Approve&itemID=" . $lateItem['itemID'] . "' 
+                                            class='btn btn-info pull-right activate'>
+                                            <i class='fa fa-check'></i> Approve</a>";
+                                }
+                                        echo '</span>';
+                                    echo '</a>';
+                                echo '</li>';
                             }
-                            echo '</span>';
-                            echo '</a>';
-                            echo '</li>';
-                        }
-                        ?>
-                        </ul>
+                            ?>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
+            <!-- Start Latest Comments -->
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="fa fa-comments-o"></i>
+                            Latest <?php echo $numComments ?> Comments
+                            <span class="toggle-info pull-right">
+									<i class="fa fa-plus fa-lg"></i>
+								</span>
+                        </div>
+                        <div class="panel-body">
+                            <?php
+                            $stmt = $dbconc->prepare("SELECT comments.*, users.userName AS Member  
+															FROM 
+																comments
+															INNER JOIN 
+																users 
+															ON 
+																users.userID = comments.user_id
+															ORDER BY 
+																c_id DESC
+															LIMIT $numComments");
+
+                            $stmt->execute();
+                            $comments = $stmt->fetchAll();
+
+                            if (! empty($comments)) {
+                                foreach ($comments as $comment) {
+                                    echo '<div class="comment-box">';
+                                    echo '<span class="member-n">
+													<a href="members.php?do=Edit&ID=' . $comment['user_id'] . '">
+														' . $comment['Member'] . '</a></span>';
+                                    echo '<p class="member-c">' . $comment['comment'] . '</p>';
+                                    echo '</div>';
+                                }
+                            } else {
+                                echo 'There\'s No Comments To Show';
+                            }
+                            ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End Latest Comments -->
         </div>
     </div>
     <?php
