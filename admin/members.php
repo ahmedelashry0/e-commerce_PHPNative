@@ -7,44 +7,54 @@ if (isset($_SESSION['Username'])) {
     $do = isset($_GET['do']) ? $_GET['do'] : 'Manage';
     if ($do == 'Manage') {
         $query = (isset($_GET['page']) && $_GET['page'] == 'Pending') ? ' AND RegStatus = 0' : '';
-        $stmt = $dbconc->prepare("SELECT * FROM users WHERE GroupID != 1 $query");
+        $stmt = $dbconc->prepare("SELECT * FROM users WHERE GroupID != 1 $query order by userID DESC");
         $stmt->execute();
         $rows = $stmt->fetchAll();
+        if (!empty($rows)) {
 ?>
-        <h1 class="text-center">Manage Member</h1>
-        <div class="container">
-            <div class="  table-responsive ">
-                <table class="main-table text-center table table-bordered">
-                    <tr>
-                        <td>#ID</td>
-                        <td>Username</td>
-                        <td>Email</td>
-                        <td>Full Name</td>
-                        <td>Registered Date</td>
-                        <td>Control</td>
-                    </tr>
-                    <?php
-                    foreach ($rows as $row) {
-                        echo "<tr>";
-                        echo "<td>" . $row['userID'] . "</td>";
-                        echo "<td>" . $row['userName'] . "</td>";
-                        echo "<td>" . $row['Email'] . "</td>";
-                        echo "<td>" . $row['Fullname'] . "</td>";
-                        echo "<td>" . $row['currDate'] ."</td>";
-                        echo "<td>
+            <h1 class="text-center">Manage Member</h1>
+            <div class="container">
+                <div class="  table-responsive ">
+                    <table class="main-table text-center table table-bordered">
+                        <tr>
+                            <td>#ID</td>
+                            <td>Username</td>
+                            <td>Email</td>
+                            <td>Full Name</td>
+                            <td>Registered Date</td>
+                            <td>Control</td>
+                        </tr>
+                        <?php
+                        foreach ($rows as $row) {
+                            echo "<tr>";
+                            echo "<td>" . $row['userID'] . "</td>";
+                            echo "<td>" . $row['userName'] . "</td>";
+                            echo "<td>" . $row['Email'] . "</td>";
+                            echo "<td>" . $row['Fullname'] . "</td>";
+                            echo "<td>" . $row['currDate'] . "</td>";
+                            echo "<td>
                             <a href='members.php?do=Edit&ID=" . $row['userID'] . "' class='btn btn-success'><i class='fa fa-edit'></i> Edit</a>
                             <a href='members.php?do=Delete&ID=" . $row['userID'] . "' class='btn btn-danger confirm'><i class='fa fa-close'></i> Delete</a>";
-                            if ($row['RegStatus'] == 0){
+                            if ($row['RegStatus'] == 0) {
                                 echo "<a href='members.php?do=Activate&ID=" . $row['userID'] . "' class='btn btn-info activate'><i class='fa fa-toggle-on'></i> Activate</a>";
                             }
-                        echo "</tr>";
-                    }
-                    ?>
+                            echo "</tr>";
+                        }
+                        ?>
 
-                </table>
+                    </table>
+                </div>
+                <a href="members.php?do=Add" class="btn btn-primary"><i class="fa fa-plus"></i> Add New Member</a>;
             </div>
-            <a href="members.php?do=Add" class="btn btn-primary"><i class="fa fa-plus"></i> Add New Member</a>;
-        </div>
+        <?php
+        } else {
+            echo "<div class='container '>";
+            echo "<div class='alert alert-info'>No members found.</div>";
+            echo  "<a href='members.php?do=Add' class='btn btn-primary'><i class='fa fa-plus'></i> Add New Member</a>";
+            echo "</div>";
+        }
+
+        ?>
     <?php } elseif ($do == 'Add') { ?>
         <h1 class="text-center">Add New Member</h1>
         <div class="container">
@@ -134,22 +144,22 @@ if (isset($_SESSION['Username'])) {
             }
             if (empty($formErrors)) {
                 // Check if the user is already exist in DB
-                $check= checkItem("userName","users",$userName);
-                if ($check == 1){
+                $check = checkItem("userName", "users", $userName);
+                if ($check == 1) {
                     $msg = "<div class ='alert alert-danger'>Username already exists</div>";
                     redirectHome($msg, 'back');
-                }else{
-                $stmt = $dbconc->prepare("INSERT INTO 
+                } else {
+                    $stmt = $dbconc->prepare("INSERT INTO 
                                             users(userName, Pass, Email, Fullname,RegStatus, currDate)
                                             VALUES(:user, :pass, :email, :fullname, 1, now())");
-                $stmt->execute(array(
-                    'user'      => $userName,
-                    'pass'      => $hashedPass,
-                    'email'     => $email,
-                    'fullname'  => $fullName
-                ));
-                $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Inserted </div>';
-                redirectHome($msg, 'back');
+                    $stmt->execute(array(
+                        'user'      => $userName,
+                        'pass'      => $hashedPass,
+                        'email'     => $email,
+                        'fullname'  => $fullName
+                    ));
+                    $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Inserted </div>';
+                    redirectHome($msg, 'back');
                 }
             }
         } else {
@@ -252,19 +262,28 @@ if (isset($_SESSION['Username'])) {
                 echo  '<div class="alert alert-danger">' . $error . '</div>';
             }
             if (empty($formErrors)) {
-                $stmt = $dbconc->prepare("UPDATE users SET userName = ? , Email = ? , Fullname = ? , Pass= ? WHERE userID = ?");
-                $stmt->execute(array($userName, $email, $fullName, $password, $id));
-                $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record update </div>';
-                redirectHome($msg, 'back');
+                $stmt2 = $dbconc->prepare("SELECT * FROM users where userName = ? AND userID != ?");
+                $stmt2->execute(array($userName, $id));
+                $count = $stmt2->rowCount();
+                if ($count > 0) {
+                    $theMsg = '<div class="alert alert-danger">Sorry This User Is Exist</div>';
+
+                    redirectHome($theMsg, 'back');
+                }else {
+                    $stmt = $dbconc->prepare("UPDATE users SET userName = ? , Email = ? , Fullname = ? , Pass= ? WHERE userID = ?");
+                    $stmt->execute(array($userName, $email, $fullName, $password, $id));
+                    $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record update </div>';
+                    redirectHome($msg, 'back');
+                }
             }
         } else {
             echo "<div class ='container'>";
-            $msg= "<div class ='alert alert-danger'>You are not authorized to view this page.</div>";
-            redirectHome($msg , 'back');
+            $msg = "<div class ='alert alert-danger'>You are not authorized to view this page.</div>";
+            redirectHome($msg, 'back');
             echo "</div>";
         }
         echo "</div>";
-    }elseif ($do == 'Delete'){
+    } elseif ($do == 'Delete') {
         echo '<h1 class="text-center">Delete Member</h1>';
         echo    '<div class="container">';
         // Check if id is numeric and get it's integer val
@@ -276,13 +295,13 @@ if (isset($_SESSION['Username'])) {
             $stmt->bindParam(":userID", $userID);
             $stmt->execute();
             $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Deleted </div>';
-            redirectHome($msg , 'back');
-        }else{
-            $msg= "<div class ='alert alert-danger'>Member doesn\'t exist</div>";
-            redirectHome($msg );
+            redirectHome($msg, 'back');
+        } else {
+            $msg = "<div class ='alert alert-danger'>Member doesn\'t exist</div>";
+            redirectHome($msg, 'back');
         }
         echo '</div>';
-    }elseif ($do == 'Activate'){
+    } elseif ($do == 'Activate') {
         echo '<h1 class="text-center">Activate Member</h1>';
         echo '<div class="container">';
         // Check if id is numeric and get it's integer val
@@ -293,10 +312,10 @@ if (isset($_SESSION['Username'])) {
             $stmt = $dbconc->prepare("UPDATE users SET RegStatus = 1 WHERE userID = ? Limit 1;");
             $stmt->execute(array($userID));
             $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Activated </div>';
-            redirectHome($msg , 'back');
-        }else{
-            $msg= "<div class ='alert alert-danger'>Member doesn\'t exist</div>";
-            redirectHome($msg );
+            redirectHome($msg, 'back');
+        } else {
+            $msg = "<div class ='alert alert-danger'>Member doesn\'t exist</div>";
+            redirectHome($msg);
         }
         echo '</div>';
     }

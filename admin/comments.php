@@ -10,9 +10,11 @@ if (isset($_SESSION['Username'])) {
                                             INNER JOIN items
                                             ON comments.item_id = items.itemID
                                             INNER JOIN users
-                                            where users.userID = comments.user_id");
+                                            where users.userID = comments.user_id
+                                            order by comments.c_id DESC");
         $stmt->execute();
         $rows = $stmt->fetchAll();
+        if (!empty($rows)) {
         ?>
         <h1 class="text-center">Manage comments</h1>
         <div class="container">
@@ -47,6 +49,14 @@ if (isset($_SESSION['Username'])) {
                 </table>
             </div>
         </div>
+            <?php
+        } else {
+            echo "<div class='container '>";
+            echo "<div class='alert alert-info'>No comments found.</div>";
+            echo "</div>";
+        }
+
+        ?>
     <?php } elseif ($do == 'Edit') { //Edit page
         // Check if id is numeric and get it's integer val
         $comID = isset($_GET['comID']) && is_numeric($_GET['comID']) ? intval($_GET['comID']) : 0;
