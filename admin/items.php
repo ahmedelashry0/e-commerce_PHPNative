@@ -94,7 +94,7 @@ if (isset($_SESSION['Username'])) {
                 <div class="form-group form-group-lg">
                     <label class="col-sm-2 control-label">Description </label>
                     <div class="col-sm-10 col-md-6">
-                        <input type="text" name="description" class="form-control" required="required" placeholder="Description of the item" />
+                        <textarea name="description" class="form-control" required="required" placeholder="Description of the item"></textarea>
                     </div>
                 </div>
                 <!-- End Item description Field -->

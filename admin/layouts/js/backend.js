@@ -41,6 +41,11 @@ $(function () {
         if ($(this).attr("required") === "required") {
             $(this).after("<span class='asterisk'>*</span>");
         }
+    });    //Add asterisk to required fields
+    $("textarea").each(function () {
+        if ($(this).attr("required") === "required") {
+            $(this).after("<span class='asterisk'>*</span>");
+        }
     });
     //Convert password field to text field on hover
     var passField = $(".password");

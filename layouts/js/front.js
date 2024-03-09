@@ -1,35 +1,31 @@
 $(function () {
     "use strict";
-    // Dashboard
+    // Switch Between Login & Signup
 
-    $('.toggle-info').click(function () {
+    $('.login-page h1 span').click(function () {
 
-        $(this).toggleClass('selected').parent().next('.panel-body').fadeToggle(100);
+        $(this).addClass('selected').siblings().removeClass('selected');
 
-        if ($(this).hasClass('selected')) {
+        $('.login-page form').hide();
 
-            $(this).html('<i class="fa fa-minus fa-lg"></i>');
-
-        } else {
-
-            $(this).html('<i class="fa fa-plus fa-lg"></i>');
-
-        }
+        $('.' + $(this).data('class')).fadeIn(100);
 
     });
+
 
     // Trigger The Selectboxit
 
     $("select").selectBoxIt({
-
         autoWidth: false,
-        theme : "bootstrap"
-
+        theme: "bootstrap",
     });
+
+    // Hide Placeholder On Form Focus
 
     $("[placeholder]")
         .focus(function () {
             $(this).attr("data-text", $(this).attr("placeholder"));
+
             $(this).attr("placeholder", "");
         })
         .blur(function () {
@@ -54,23 +50,7 @@ $(function () {
     );
 
     //Categorie view option
-    $('.confirm').click(function () {
-        return confirm('Are you sure');
-    })
-
-    $('.cat h3').click(function () {
-        $(this).next('.full-view').fadeToggle(200);
-    })
-    $('.option span').click(function () {
-        $(this).addClass('active').siblings('span').removeClass('active');
-        if ($(this).data('view') === 'full') {
-
-            $('.cat .full-view').fadeIn(200);
-
-        } else {
-
-            $('.cat .full-view').fadeOut(200);
-
-        }
-    })
+    $(".confirm").click(function () {
+        return confirm("Are you sure");
+    });
 });

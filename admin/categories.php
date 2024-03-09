@@ -92,7 +92,7 @@ if (isset($_SESSION['Username'])) {
         <?php } else {
 
             echo '<div class="container">';
-            echo '<div class="nice-message">There\'s No Categories To Show</div>';
+            echo '<div class="alert alert-info">There\'s No Categories To Show</div>';
             echo '<a href="categories.php?do=Add" class="btn btn-primary">
 							<i class="fa fa-plus"></i> New Category
 						</a>';

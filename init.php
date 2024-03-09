@@ -1,6 +1,6 @@
 <?php
 // DATABASE CONNECTION
-include 'connect.php';
+include 'admin/connect.php';
 
 // ROUTES
 $tpl = 'includes/templates/';
@@ -14,7 +14,4 @@ include $lang . 'en.php';
 include $tpl . 'header.php';
 
 
-// INCLUDE NAVBAR ON ALL PAGES EXCEPT THE ONE WITH $noNavbar VARIABLE
-if (!isset($noNavbar)) {
-    include $tpl . 'navbar.php';
-}
+

@@ -1,5 +1,38 @@
 <?php
 /*
+	** Get All Function v2.0
+	** Function To Get All Records From Any Database Table
+	*/
+
+function getCats() {
+
+    global $dbconc;
+
+    $getAll = $dbconc->prepare("SELECT * FROM categories ORDER BY catID");
+
+    $getAll->execute();
+
+    $all = $getAll->fetchAll();
+
+    return $all;
+
+    //Get items
+}function getItems($catID) {
+
+    global $dbconc;
+
+    $getItems = $dbconc->prepare("SELECT * FROM items WHERE items.Cat_ID = ? ORDER BY itemID");
+
+    $getItems->execute(array($catID));
+
+    $all = $getItems->fetchAll();
+
+    return $all;
+
+}
+
+
+/*
 ** Title Function that echo the page title in case the page
 ** has the variable $pageTitle and echo default title for other pages
 */ 
