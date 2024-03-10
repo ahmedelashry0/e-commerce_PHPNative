@@ -1,7 +1,7 @@
 <?php
-
+    session_start();
+$pageTitle = 'Homepage';
     include 'init.php';
-    echo 'welcome';
 
     include $tpl . 'footer.php';
 ?>

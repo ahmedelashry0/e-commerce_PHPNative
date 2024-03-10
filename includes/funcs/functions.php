@@ -14,16 +14,41 @@ function getCats() {
 
     $all = $getAll->fetchAll();
 
-    return $all;
+    return $all;}
 
-    //Get items
-}function getItems($catID) {
+/*
+** Check If User Is Not Activated
+** Function To Check The RegStatus Of The User
+*/
+function checkUserStatus($user) {
 
     global $dbconc;
 
-    $getItems = $dbconc->prepare("SELECT * FROM items WHERE items.Cat_ID = ? ORDER BY itemID");
+    $stmtx = $dbconc->prepare("SELECT 
+									userName, RegStatus 
+								FROM 
+									users 
+								WHERE 
+									userName = ? 
+								AND 
+									RegStatus = 0");
 
-    $getItems->execute(array($catID));
+    $stmtx->execute(array($user));
+
+    $status = $stmtx->rowCount();
+
+    return $status;
+
+}
+
+    //Get items
+    function getItems($where, $value) {
+
+    global $dbconc;
+
+    $getItems = $dbconc->prepare("SELECT * FROM items WHERE $where = ? ORDER BY itemID DESC");
+
+    $getItems->execute(array($value));
 
     $all = $getItems->fetchAll();
 
