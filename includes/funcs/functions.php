@@ -41,12 +41,14 @@ function checkUserStatus($user) {
 
 }
 
-    //Get items
-    function getItems($where, $value) {
+    //Get AD items
+    function getItems($where, $value , $approve = NULL) {
 
     global $dbconc;
 
-    $getItems = $dbconc->prepare("SELECT * FROM items WHERE $where = ? ORDER BY itemID DESC");
+    $sql = $approve == NULL ? "AND Approve = 1" : Null;
+
+    $getItems = $dbconc->prepare("SELECT * FROM items WHERE $where = ? $sql ORDER BY itemID DESC");
 
     $getItems->execute(array($value));
 

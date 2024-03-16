@@ -20,7 +20,9 @@ $stmt = $dbconc->prepare("SELECT
                                 ON 
                                     items.Member_ID = users.userID
                                 WHERE 
-                                    itemID = ?");
+                                    itemID = ?
+                                AND
+                                    Approve = 1");
 $stmt->execute(array($itemID));
 $count = $stmt->rowCount();
 if ($count > 0){
@@ -126,10 +128,56 @@ if ($count > 0){
     <?php } else {
         echo '<a href="login.php">Login</a> or <a href="login.php">Register</a> To Add Comment';
     } ?>
+        <hr class="custom-hr">
+        <?php
+
+        // Select All Users Except Admin
+        $stmt = $dbconc->prepare("SELECT 
+										comments.*, users.userName AS Member  
+									FROM 
+										comments
+									INNER JOIN 
+										users 
+									ON 
+										users.userID = comments.user_id
+									WHERE 
+										item_id = ?
+									AND 
+										status = 1
+									ORDER BY 
+										c_id DESC");
+
+        // Execute The Statement
+
+        $stmt->execute(array($item['itemID']));
+
+        // Assign To Variable
+
+        $comments = $stmt->fetchAll();
+
+        ?>
+
+        <?php foreach ($comments as $comment) { ?>
+            <div class="comment-box">
+                <div class="row">
+                    <div class="col-sm-2 text-center">
+                        <img class="img-responsive img-thumbnail img-circle center-block" src="img.png" alt="" />
+                        <?php echo $comment['Member'] ?>
+                    </div>
+                    <div class="col-sm-10">
+                        <p class="lead"><?php echo $comment['comment'] ?></p>
+                    </div>
+                </div>
+            </div>
+            <hr class="custom-hr">
+        <?php } ?>
+    </div>
 
     <?php
-}else{
-    echo '<h1 class="text-center">Item Not Found</h1>';
+} else {
+    echo '<div class="container">';
+    echo '<div class="alert alert-danger">There\'s no Such ID Or This Item Is Waiting Approval</div>';
+    echo '</div>';
 }
 include $tpl . 'footer.php';
 ob_end_flush();
