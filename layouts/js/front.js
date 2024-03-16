@@ -53,4 +53,11 @@ $(function () {
     $(".confirm").click(function () {
         return confirm("Are you sure");
     });
+
+
+    $('.live').keyup(function () {
+
+        $($(this).data('class')).text($(this).val());
+
+    });
 });

@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $hashedPass = sha1($pass);
 
         // Check if the user exist in the database
-        $stmt = $dbconc->prepare("SELECT userName, Pass
+        $stmt = $dbconc->prepare("SELECT userID, userName, Pass
                                 FROM 
                                     users 
                                 WHERE 
@@ -21,11 +21,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 AND 
                                     Pass = ? ");
         $stmt->execute(array($user, $hashedPass));
+        $get = $stmt->fetch();
         $count = $stmt->rowCount();
 
         // If count > 0 this mean the database contain record about this username
         if ($count > 0) {
-            $_SESSION['user'] = $user; // Register session name
+            $_SESSION['user'] = $user;// Register session name
+            $_SESSION['uid'] = $get['userID'];
             header('Location: index.php'); // Redirect to dashboard page
             exit();
         }
@@ -38,6 +40,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             //sanitize username
             if (isset($user)){
                 $filteredUser = filter_var($user, FILTER_UNSAFE_RAW);
+                if (strlen($filteredUser)  < 4) {
+                    $formErrors[] = "Username can't be less than 4 characters";
+                }
             }
             //confirm password
             if (isset($pass) &&  isset($pass2)){
@@ -62,11 +67,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 if ($check == 1){
                     $formErrors[] = "Username is already taken";
                 }else{
-                    $stmt = $dbconc->prepare("INSERT INTO users (userName, Pass, email , currDate) 
-                                                                VALUES (:zuser, :zpass, :zemail, NOW())");
+                    $stmt = $dbconc->prepare("INSERT INTO users (userName, Pass, email, RegStatus , currDate) 
+                                                                VALUES (:zuser, :zpass, :zemail,0 , NOW())");
                     $stmt->execute(array('zuser' => $user, 'zpass' => sha1($pass), 'zemail' => $email));
 
-                    $succesMsg = 'Congrats You Are Now Registerd User';
+                    $succesMsg = 'Congrats You Are Now Registered User';
                 }
             }
     }

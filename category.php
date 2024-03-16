@@ -1,7 +1,7 @@
 <?php global $tpl;
 include 'init.php' ?>
     <div class="container">
-        <h1 class="text-center"><?php echo str_replace('-', ' ', $_GET['pageName']) ?></h1>
+        <h1 class="text-center">Show category items</h1>
         <div class="row">
             <?php
 
@@ -11,7 +11,7 @@ include 'init.php' ?>
                     echo '<span class= price-tag>$' . $item['Price'] . '</span>';
                     echo '<img class="img-responsive" src="img.png" alt="">';
                         echo '<div class="caption">';
-                             echo '<h3>' . $item['Name'] . '</h3>';
+                             echo '<h3><a href="items.php?itemID='.$item['itemID'].'">' . $item['Name'] . '</a></h3>';
                             echo '<p>' . $item['Description'] . '</p>';
                         echo '</div>';
                     echo '</div>';
