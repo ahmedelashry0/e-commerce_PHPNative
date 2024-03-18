@@ -65,19 +65,19 @@ if (isset($_SESSION['Username'])) {
                             }
                             echo "</div>";
 
-                            // Get Child Categories
-//                            $childCats = getAllFrom("*", "categories", "where parent = {$cat['catID']}", "", "ID", "ASC");
-//                            if (! empty($childCats)) {
-//                                echo "<h4 class='child-head'>Child Categories</h4>";
-//                                echo "<ul class='list-unstyled child-cats'>";
-//                                foreach ($childCats as $c) {
-//                                    echo "<li class='child-link'>
-//												<a href='categories.php?do=Edit&catid=" . $c['ID'] . "'>" . $c['Name'] . "</a>
-//												<a href='categories.php?do=Delete&catid=" . $c['ID'] . "' class='show-delete confirm'> Delete</a>
-//											</li>";
-//                                }
-//                                echo "</ul>";
-//                            }
+                             //Get Child Categories
+                            $childCats = getAllFrom("*", "categories", "where parent = {$cat['catID']}", "", "catID", "ASC");
+                            if (! empty($childCats)) {
+                                echo "<h4 class='child-head'>Child Categories</h4>";
+                                echo "<ul class='list-unstyled child-cats'>";
+                                foreach ($childCats as $c) {
+                                    echo "<li class='child-link'>
+												<a href='categories.php?do=Edit&catID=" . $c['catID'] . "'>" . $c['catName'] . "</a>
+												<a href='categories.php?do=Delete&catID=" . $c['catID'] . "' class='show-delete confirm'> Delete</a>
+											</li>";
+                                }
+                                echo "</ul>";
+                            }
 
                             echo "</div>";
                             echo "<hr>";
@@ -132,6 +132,22 @@ if (isset($_SESSION['Username'])) {
                     </div>
                 </div>
                 <!-- End Ordering Field -->
+                <!-- Start Category Type -->
+                <div class="form-group form-group-lg">
+                    <label class="col-sm-2 control-label">Parent?</label>
+                    <div class="col-sm-10 col-md-6">
+                        <select name="parent">
+                            <option value="0">None</option>
+                            <?php
+                            $allCats = getAllFrom("*", "categories", "where parent = 0", "", "catID", "ASC");
+                            foreach($allCats as $cat) {
+                                echo "<option value='" . $cat['catID'] . "'>" . $cat['catName'] . "</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                </div>
+                <!-- End Category Type -->
                 <!-- Start Visible Field -->
                 <div class="form-group form-group-lg">
                     <label class="col-sm-2 control-label">Visible</label>
@@ -195,6 +211,7 @@ if (isset($_SESSION['Username'])) {
             echo "<div class='container'>";
             $catName = $_POST['catName'];
             $description = $_POST['description'];
+            $parent = $_POST['parent'];
             $order = $_POST['ordering'];
             $visibility = $_POST['visibility'];
             $commenting = $_POST['commenting'];
@@ -207,15 +224,16 @@ if (isset($_SESSION['Username'])) {
                     redirectHome($msg, 'back');
                 } else {
                     $stmt = $dbconc->prepare("INSERT INTO 
-                                            categories(catName, catDescription, ordering, visibility,Allow_comments, Allow_Ads)
-                                            VALUES(:cat, :des, :order, :visibility, :com, :ads)");
+                                            categories(catName, catDescription, ordering, visibility,Allow_comments, Allow_Ads , parent)
+                                            VALUES(:cat, :des, :order, :visibility, :com, :ads ,:parent)");
                     $stmt->execute(array(
                         'cat' => $catName,
                         'des' => $description,
                         'order' => empty($order) ? Null : $order,
                         'visibility' => $visibility,
                         'com' => $commenting,
-                        'ads' => $Ads
+                        'ads' => $Ads,
+                        'parent' => $parent
                     ));
                     $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Inserted </div>';
                     redirectHome($msg, 'back');
@@ -270,6 +288,24 @@ if (isset($_SESSION['Username'])) {
                         </div>
                     </div>
                     <!-- End Ordering Field -->
+                    <!-- Start Category Type -->
+                    <div class="form-group form-group-lg">
+                        <label class="col-sm-2 control-label">Parent?</label>
+                        <div class="col-sm-10 col-md-6">
+                            <select name="parent">
+                                <option value="0">None</option>
+                                <?php
+                                $allCats = getAllFrom("*", "categories", "where parent = 0", "", "catID", "ASC");
+                                foreach($allCats as $c) {
+                                    echo "<option value='" . $c['catID'] . "'";
+                                    if ($cat['parent'] == $c['catID']) { echo ' selected'; }
+                                    echo ">" . $c['catName'] . "</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- End Category Type -->
                     <!-- Start Visible Field -->
                     <div class="form-group form-group-lg">
                         <label class="col-sm-2 control-label">Visible</label>
@@ -345,12 +381,13 @@ if (isset($_SESSION['Username'])) {
             $catName = $_POST['catName'];
             $desc = $_POST['description'];
             $order = !empty($_POST['ordering']) ? $_POST['ordering'] : Null;
+            $parent = $_POST['parent'];
             $visible = $_POST['visibility'];
             $comment = $_POST['commenting'];
             $ads = $_POST['ads'];
             // Validate the form
-            $stmt = $dbconc->prepare("UPDATE categories SET catName = ? , catDescription = ? , ordering = ? , visibility= ? , Allow_comments = ?, Allow_Ads = ? WHERE catID = ?");
-            $stmt->execute(array($catName, $desc, $order, $visible, $comment, $ads, $id));
+            $stmt = $dbconc->prepare("UPDATE categories SET catName = ? , catDescription = ? , ordering = ? , visibility= ? , Allow_comments = ?, Allow_Ads = ? , parent = ? WHERE catID = ?");
+            $stmt->execute(array($catName, $desc, $order, $visible, $comment, $ads,$parent , $id));
             $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record update </div>';
             redirectHome($msg, 'back');
         } else {

@@ -136,10 +136,8 @@ if (isset($_SESSION['Username'])) {
                         <select name="members">
                             <option value="0">...</option>
                             <?php
-                            $stmt = $dbconc->prepare("SELECT * FROM users");
-                            $stmt->execute();
-                            $users = $stmt->fetchAll();
-                            foreach ($users as $user) {
+                            $allMembers = getAllFrom("*", "users", "", "", "userID");
+                            foreach ($allMembers as $user) {
                                 echo "<option value='" . $user['userID'] . "'>" . $user['userName'] . "</option>";
                             }
                             ?>
@@ -154,17 +152,32 @@ if (isset($_SESSION['Username'])) {
                         <select name="categories">
                             <option value="0">...</option>
                             <?php
-                            $stmt = $dbconc->prepare("SELECT * FROM categories");
-                            $stmt->execute();
-                            $cats = $stmt->fetchAll();
-                            foreach ($cats as $cat) {
+                            $allCats = getAllFrom("*", "categories", "where parent = 0", "", "catID");
+                            foreach ($allCats as $cat) {
                                 echo "<option value='" . $cat['catID'] . "'>" . $cat['catName'] . "</option>";
+                                    $childCats = getAllFrom("*", "categories", "where parent = {$cat['catID']}", "", "catID");
+                                    foreach ($childCats as $child) {
+                                        echo "<option value='" . $child['catID'] . "'>--- " . $child['catName'] . "</option>";
+                                    }
                             }
                             ?>
                         </select>
                     </div>
                 </div>
                 <!-- End categories Field -->
+
+                <!-- Start Tags Field -->
+					<div class="form-group form-group-lg">
+						<label class="col-sm-2 control-label">Tags</label>
+						<div class="col-sm-10 col-md-6">
+							<input
+								type="text"
+								name="tags"
+								class="form-control"
+								placeholder="Separate Tags With Comma (,)" />
+						</div>
+					</div>
+					<!-- End Tags Field -->
 
                 <!-- Start Submit Field -->
                 <div class="form-group form-group-lg">
@@ -189,6 +202,7 @@ if (isset($_SESSION['Username'])) {
             $status         = $_POST['status'];
             $members        = $_POST['members'];
             $categories     = $_POST['categories'];
+            $tags           = $_POST['tags'];
             // Validate the form
             $formErrors = array();
             if (empty($Name)) {
@@ -217,8 +231,8 @@ if (isset($_SESSION['Username'])) {
             }
             if (empty($formErrors)) {
                 $stmt = $dbconc->prepare("INSERT INTO 
-                                            items(Name, Description, Price, AddedDate,Country, status, Cat_ID, Member_ID)
-                                            VALUES(:name, :des, :price, now(), :country, :status, :cat_id, :member_id)");
+                                            items(Name, Description, Price, AddedDate,Country, status, Cat_ID, Member_ID, tags)
+                                            VALUES(:name, :des, :price, now(), :country, :status, :cat_id, :member_id ,:tags)");
                 $stmt->execute(array(
                     'name'          => $Name,
                     'des'           => $description,
@@ -227,6 +241,7 @@ if (isset($_SESSION['Username'])) {
                     'status'        => $status,
                     'cat_id'        => $categories,
                     'member_id'     => $members,
+                    'tags'     => $tags,
                 ));
                 $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Inserted </div>';
                 redirectHome($msg, 'back');
@@ -339,6 +354,19 @@ if (isset($_SESSION['Username'])) {
                         </div>
                     </div>
                     <!-- End categories Field -->
+                    <!-- Start Tags Field -->
+						<div class="form-group form-group-lg">
+							<label class="col-sm-2 control-label">Tags</label>
+							<div class="col-sm-10 col-md-6">
+								<input
+									type="text"
+									name="tags"
+									class="form-control"
+									placeholder="Separate Tags With Comma (,)"
+									value="<?php echo $item['tags'] ?>" />
+							</div>
+						</div>
+						<!-- End Tags Field -->
 
                     <!-- Start Submit Field -->
                     <div class="form-group form-group-lg">
@@ -405,6 +433,7 @@ if (isset($_SESSION['Username'])) {
                 $status         = $_POST['status'];
                 $members        = $_POST['members'];
                 $categories     = $_POST['categories'];
+                $tags           = $_POST['tags'];
                 // Validate the form
                 $formErrors = array();
                 if (empty($Name)) {
@@ -433,15 +462,16 @@ if (isset($_SESSION['Username'])) {
                 }
                 if (empty($formErrors)) {
                     $stmt = $dbconc->prepare("UPDATE items SET 
-                 Name = ? , 
-                 Description = ? , 
-                 Price = ? , 
-                 Country= ? , 
-                 status = ?,
-                 Cat_ID = ?,
-                 Member_ID = ?
-                 WHERE itemID = ?");
-                    $stmt->execute(array($Name, $description, $price, $country, $status, $categories, $members, $id));
+                                                         Name = ? , 
+                                                         Description = ? , 
+                                                         Price = ? , 
+                                                         Country= ? , 
+                                                         status = ?,
+                                                         Cat_ID = ?,
+                                                         Member_ID = ?,
+                                                         tags = ?
+                                                         WHERE itemID = ?");
+                    $stmt->execute(array($Name, $description, $price, $country, $status, $categories, $members,$tags, $id));
                     $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record update </div>';
                     redirectHome($msg, 'back');
                 }

@@ -1,21 +1,22 @@
 <?php
 /*
-	** Get All Function v2.0
-	** Function To Get All Records From Any Database Table
-	*/
+** Get All Function v2.0
+** Function To Get All Records From Any Database Table
+*/
 
-function getCats() {
+function getAllFrom($field, $table, $where = NULL, $and = NULL, $orderfield, $ordering = "DESC") {
 
     global $dbconc;
 
-    $getAll = $dbconc->prepare("SELECT * FROM categories ORDER BY catID");
+    $getAll = $dbconc->prepare("SELECT $field FROM $table $where $and ORDER BY $orderfield $ordering");
 
     $getAll->execute();
 
     $all = $getAll->fetchAll();
 
-    return $all;}
+    return $all;
 
+}
 /*
 ** Check If User Is Not Activated
 ** Function To Check The RegStatus Of The User

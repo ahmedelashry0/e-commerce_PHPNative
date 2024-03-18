@@ -27,6 +27,7 @@ $(function () {
 
     });
 
+    // Hide placeHolder on Form focus
     $("[placeholder]")
         .focus(function () {
             $(this).attr("data-text", $(this).attr("placeholder"));
@@ -41,11 +42,9 @@ $(function () {
         if ($(this).attr("required") === "required") {
             $(this).after("<span class='asterisk'>*</span>");
         }
-    });    //Add asterisk to required fields
-    $("textarea").each(function () {
-        if ($(this).attr("required") === "required") {
-            $(this).after("<span class='asterisk'>*</span>");
-        }
+    });
+
+
     });
     //Convert password field to text field on hover
     var passField = $(".password");
@@ -58,11 +57,12 @@ $(function () {
         }
     );
 
-    //Categorie view option
+    // Confirmation Message On Button
     $('.confirm').click(function () {
         return confirm('Are you sure');
     })
 
+    // Category View Option
     $('.cat h3').click(function () {
         $(this).next('.full-view').fadeToggle(200);
     })
@@ -77,5 +77,15 @@ $(function () {
             $('.cat .full-view').fadeOut(200);
 
         }
-    })
-});
+    });
+    // Show Delete Button On Child Cats
+
+    $('.child-link').hover(function () {
+
+        $(this).find('.show-delete').fadeIn(400);
+
+    }, function () {
+
+        $(this).find('.show-delete').fadeOut(400);
+
+    });

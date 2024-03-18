@@ -1,5 +1,23 @@
 <?php
 /*
+** Get All Function v2.0
+** Function To Get All Records From Any Database Table
+*/
+
+function getAllFrom($field, $table, $where = NULL, $and = NULL, $orderfield, $ordering = "DESC") {
+
+    global $dbconc;
+
+    $getAll = $dbconc->prepare("SELECT $field FROM $table $where $and ORDER BY $orderfield $ordering");
+
+    $getAll->execute();
+
+    $all = $getAll->fetchAll();
+
+    return $all;
+
+}
+/*
 ** Title Function that echo the page title in case the page
 ** has the variable $pageTitle and echo default title for other pages
 */ 

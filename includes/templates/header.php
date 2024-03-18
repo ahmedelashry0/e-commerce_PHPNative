@@ -55,7 +55,7 @@
             <div class="collapse navbar-collapse" id="app-nav">
                 <ul class="nav navbar-nav navbar-right">
                     <?php
-                    $allCats = getCats();
+                    $allCats = getAllFrom("*", "categories", "where parent = 0", "", "catID", "ASC");
                     foreach ($allCats as $cat) {
                         echo '<li><a href="category.php?pageID=' . $cat['catID'] . '&pageName=' . str_replace(' ', '-', $cat['catName']) . '">' . $cat['catName'] . '</a></li>';
                     }

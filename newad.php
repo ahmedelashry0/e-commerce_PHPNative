@@ -12,6 +12,7 @@ if (isset($_SESSION['user'])) {
         $itemCountry    = filter_var($_POST['country'], FILTER_UNSAFE_RAW);
         $itemStatus     = filter_var($_POST['status'], FILTER_SANITIZE_NUMBER_INT);
         $itemCat        = filter_var($_POST['categories'], FILTER_SANITIZE_NUMBER_INT);
+        $tags 		    = filter_var($_POST['tags'], FILTER_UNSAFE_RAW);
 
         if (strlen($itemName) < 4) {
 
@@ -50,8 +51,8 @@ if (isset($_SESSION['user'])) {
         }
         if (empty($formErrors)){
             $stmt = $dbconc->prepare("INSERT INTO
-                                            items(Name, Description, Price, AddedDate,Country, status, Cat_ID, Member_ID)
-                                            VALUES(:name, :des, :price, now(), :country, :status, :cat_id, :member_id)");
+                                            items(Name, Description, Price, AddedDate,Country, status, Cat_ID, Member_ID, tags)
+                                            VALUES(:name, :des, :price, now(), :country, :status, :cat_id, :member_id, :tags)");
             $stmt->execute(array(
                 'name'          => $itemName,
                 'des'           => $itemDesc,
@@ -60,6 +61,7 @@ if (isset($_SESSION['user'])) {
                 'status'        => $itemStatus,
                 'cat_id'        => $itemCat,
                 'member_id'     => $_SESSION['uid'],
+                'tags'          => $tags,
             ));
             // Echo Success Message
 
@@ -164,11 +166,13 @@ if (isset($_SESSION['user'])) {
                                         <select name="categories">
                                             <option value="">...</option>
                                             <?php
-                                            $stmt = $dbconc->prepare("SELECT * FROM categories");
-                                            $stmt->execute();
-                                            $cats = $stmt->fetchAll();
+                                            $cats = getAllFrom('*' ,'categories', '', '', 'CatID');
                                             foreach ($cats as $cat) {
                                                 echo "<option value='" . $cat['catID'] . "'>" . $cat['catName'] . "</option>";
+                                                    $childCats = getAllFrom("*", "categories", "where parent = {$cat['catID']}", "", "catID");
+                                                    foreach ($childCats as $child) {
+                                                        echo "<option value='" . $child['catID'] . "'>--- " . $child['catName'] . "</option>";
+                                                    }
                                             }
                                             ?>
                                         </select>
@@ -176,9 +180,22 @@ if (isset($_SESSION['user'])) {
                                 </div>
                                 <!-- End categories Field -->
 
+                                <!-- Start Tags Field -->
+                                <div class="form-group form-group-lg">
+                                    <label class="col-sm-2 control-label">Tags</label>
+                                    <div class="col-sm-10 col-md-9">
+                                        <input
+                                                type="text"
+                                                name="tags"
+                                                class="form-control"
+                                                placeholder="Separate Tags With Comma (,)" />
+                                    </div>
+                                </div>
+                                <!-- End Tags Field -->
+
                                 <!-- Start Submit Field -->
                                 <div class="form-group form-group-lg">
-                                    <div class="col-sm-offset-2 col-sm-10">
+                                    <div class="col-sm-offset-3 col-sm-9">
                                         <input type="submit" value="Add item" class="btn btn-primary btn-sm"/>
                                     </div>
                                 </div>
