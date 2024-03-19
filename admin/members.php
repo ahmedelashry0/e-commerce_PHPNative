@@ -15,9 +15,10 @@ if (isset($_SESSION['Username'])) {
             <h1 class="text-center">Manage Member</h1>
             <div class="container">
                 <div class="  table-responsive ">
-                    <table class="main-table text-center table table-bordered">
+                    <table class="main-table manage-members text-center table table-bordered">
                         <tr>
                             <td>#ID</td>
+                            <td>Avatar</td>
                             <td>Username</td>
                             <td>Email</td>
                             <td>Full Name</td>
@@ -28,6 +29,13 @@ if (isset($_SESSION['Username'])) {
                         foreach ($rows as $row) {
                             echo "<tr>";
                             echo "<td>" . $row['userID'] . "</td>";
+                            echo "<td>";
+                            if (empty($row['avatar'])) {
+                                echo 'No Image';
+                            } else {
+                                echo "<img src='uploads/avatars/" . $row['avatar'] . "' alt='' />";
+                            }
+                            echo "</td>";
                             echo "<td>" . $row['userName'] . "</td>";
                             echo "<td>" . $row['Email'] . "</td>";
                             echo "<td>" . $row['Fullname'] . "</td>";
@@ -58,7 +66,7 @@ if (isset($_SESSION['Username'])) {
     <?php } elseif ($do == 'Add') { ?>
         <h1 class="text-center">Add New Member</h1>
         <div class="container">
-            <form class="form-horizontal" action="?do=Insert" method="POST">
+            <form class="form-horizontal" action="?do=Insert" method="POST" enctype="multipart/form-data">
                 <!-- Start Username Field -->
                 <div class="form-group form-group-lg">
                     <label class="col-sm-2 control-label">Username</label>
@@ -114,6 +122,21 @@ if (isset($_SESSION['Username'])) {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             echo "<h1 class='text-center'>Add Member</h1>";
             echo "<div class='container'>";
+            //Upload variables
+            $avatarName     = $_FILES['avatar']['name'];
+            $avatarSize     = $_FILES['avatar']['size'];
+            $avatarTemp     = $_FILES['avatar']['tmp_name'];
+            $avatarType     = $_FILES['avatar']['type'];
+
+            //List of allowed file types
+            $avatarAllowedExtension = array("jpeg", "jpg", "png", "gif");
+
+            // Get Avatar Extension
+
+            $avatarNameParts = explode('.', $avatarName);
+            $avatarExtension = strtolower(end($avatarNameParts));
+
+            // Get Variables From The Form
             $userName       = $_POST['username'];
             $password       = $_POST['password'];
             $email          = $_POST['email'];
@@ -139,24 +162,39 @@ if (isset($_SESSION['Username'])) {
             if (empty($fullName)) {
                 $formErrors[] = 'Full Name can\'t be <strong>empty</strong>';
             }
+            if (! empty($avatarName) && ! in_array($avatarExtension, $avatarAllowedExtension)) {
+                $formErrors[] = 'This Extension Is Not <strong>Allowed</strong>';
+            }
+
+            if (empty($avatarName)) {
+                $formErrors[] = 'Avatar Is <strong>Required</strong>';
+            }
+
+            if ($avatarSize > 4194304) {
+                $formErrors[] = 'Avatar Cant Be Larger Than <strong>4MB</strong>';
+            }
             foreach ($formErrors as $error) {
                 echo  '<div class="alert alert-danger">' . $error . '</div>';
             }
             if (empty($formErrors)) {
-                // Check if the user is already exist in DB
+
+                $avatar = rand(0, 1000000) . '.' . $avatarName;
+                move_uploaded_file($avatarTemp, "uploads\avatars\\" . $avatar);
+//                // Check if the user is already exist in DB
                 $check = checkItem("userName", "users", $userName);
                 if ($check == 1) {
                     $msg = "<div class ='alert alert-danger'>Username already exists</div>";
                     redirectHome($msg, 'back');
                 } else {
-                    $stmt = $dbconc->prepare("INSERT INTO 
-                                            users(userName, Pass, Email, Fullname,RegStatus, currDate)
-                                            VALUES(:user, :pass, :email, :fullname, 1, now())");
+                    $stmt = $dbconc->prepare("INSERT INTO
+                                            users(userName, Pass, Email, Fullname,RegStatus, currDate, avatar)
+                                            VALUES(:user, :pass, :email, :fullname, 1, now(),:avatar )");
                     $stmt->execute(array(
                         'user'      => $userName,
                         'pass'      => $hashedPass,
                         'email'     => $email,
-                        'fullname'  => $fullName
+                        'fullname'  => $fullName,
+                        'avatar'    => $avatar
                     ));
                     $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Inserted </div>';
                     redirectHome($msg, 'back');
@@ -269,7 +307,7 @@ if (isset($_SESSION['Username'])) {
                     $theMsg = '<div class="alert alert-danger">Sorry This User Is Exist</div>';
 
                     redirectHome($theMsg, 'back');
-                }else {
+                } else {
                     $stmt = $dbconc->prepare("UPDATE users SET userName = ? , Email = ? , Fullname = ? , Pass= ? WHERE userID = ?");
                     $stmt->execute(array($userName, $email, $fullName, $password, $id));
                     $msg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record update </div>';
